@@ -9,7 +9,7 @@ from logic.settings import arg, DAYS, GAMMA, age_groups, R0
 # import graphviz
 
 
-class ConctactTracing(DiseaseModel):
+class ContactTracing(DiseaseModel):
     """
     Simulate continuous-time SIRPy epidemics.
     Object Oriented Bayesian Network for SIR Models
@@ -27,10 +27,10 @@ class ConctactTracing(DiseaseModel):
         self._num_comp = len(_compartments)
 
     def solve(self, r0, t_vec, x_init: list):
-        return super(ConctactTracing, self).solve(r0, t_vec, x_init)
+        return super(ContactTracing, self).solve(r0, t_vec, x_init)
 
     def result(self, arg: dict, days: int, r0):
-        return super(ConctactTracing, self).result(arg, days, r0)
+        return super(ContactTracing, self).result(arg, days, r0)
     
     def equations(self, x, t, r0):
         try:
@@ -65,7 +65,7 @@ if __name__ == "__main__":
     result = []
     for key, value in age_groups.items():
         dict_temp = {key: value}
-        ct = ConctactTracing(_compartments=compartments, _transitions=transitions, _gamma=GAMMA, _beta=value)
+        ct = ContactTracing(_compartments=compartments, _transitions=transitions, _gamma=GAMMA, _beta=value)
         resp = ct.result(arg=arg, days=DAYS, r0=R0)
         dict_temp.update({item['_name']: item['_result'] for item in resp})
         result.append(dict_temp)

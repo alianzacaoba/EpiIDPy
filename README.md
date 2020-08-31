@@ -11,7 +11,7 @@ The following illustrates and describes the process of creating a
 SIRPy type of model.
 
 
-![](./media/BPM_SIRPy.png)
+![](./media/BPM_SIRPy.png){:height="50%" width="50%"}
 
 To create a new model, you must instantiate the base object 
 DiseaseModel and implement the equations method and the main 

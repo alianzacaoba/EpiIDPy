@@ -64,7 +64,7 @@ if __name__ == "__main__":
 
     result = []
     for key, value in age_groups.items():
-        dict_temp = {key: value}
+        dict_temp = {'age_group': key}
         ct = ContactTracing(_compartments=compartments, _transitions=transitions, _gamma=GAMMA, _beta=value)
         resp = ct.result(arg=arg, days=DAYS, r0=R0)
         dict_temp.update({item['_name']: item['_result'] for item in resp})

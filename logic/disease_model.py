@@ -8,8 +8,7 @@ from logic.transitions import Transitions
 
 class DiseaseModel(ABC):
 
-    def __init__(self, compartments: List[Compartments], transitions: List[Transitions],
-                 beta: float, gamma: float):
+    def __init__(self, compartments: List[Compartments], value_a: float, value_b: float, value_c: float):
         """
             Init Disease Model with parameters.
 
@@ -25,53 +24,9 @@ class DiseaseModel(ABC):
                 object disease model.
         """
         self._compartments = compartments
-        self._transitions = transitions
-        self._beta = beta
-        self._gamma = gamma
-
-    @property
-    def transitions(self):
-        """
-            Returns the list transitions compartment between compartment.
-        Returns
-        ---------
-            list
-                List of transitions compartment between compartment.
-        """
-        return self._transitions
-
-    @transitions.setter
-    def transitions(self, transitions: List[Transitions]):
-        """
-            The list transitions compartment between compartment are assigned.
-        Parameters
-        ---------
-            transitions : list
-                List of transitions compartment between compartment.
-        """
-        self._transitions = transitions
-
-    @property
-    def compartments(self):
-        """
-            Returns the list of compartments are assigned.
-        Returns
-        -------
-            list
-                List of compartment.
-        """
-        return self._compartments
-
-    @compartments.setter
-    def compartments(self, compartments: List[Compartments]):
-        """
-             The list compartments are assigned..
-        Parameters
-        ---------
-            compartments : list
-                List of compartment.
-        """
-        self._compartments = compartments
+        self.value_a = value_a
+        self.value_b = value_b
+        self.value_c = value_c
 
     def equations(self, x, t, r0):
         """
@@ -111,14 +66,14 @@ class DiseaseModel(ABC):
             result = odeint(lambda x, t: self.equations(x, t, r0), x_init, t_vec)
             result = np.transpose(result)
             for k, _ in enumerate(result):
-                self.compartments[k].result = result[k]
-                self.compartments[k].value = x_init[k]
-            return [state.__str__() for state in self.compartments]
+                self._compartments[k].result = result[k]
+                self._compartments[k].value = x_init[k]
+            return {state.name: state.result for state in self._compartments}
         except Exception as e:
             print('Error solve: {0}'.format(e))
             return None
 
-    def result(self, arg: dict, days: int, r0: float):
+    def result(self, days: int, r0: float):
         """
             Returns all values of the disease model.
         Parameters
@@ -135,7 +90,7 @@ class DiseaseModel(ABC):
                 values by compartment.
         """
         try:
-            val = list(arg.values())
+            val = [c.value for c in self._compartments]
             t_vec = np.linspace(start=0, stop=days, num=days)
             resp = self.solve(r0, t_vec, val)
             return resp

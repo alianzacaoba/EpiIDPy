@@ -1,14 +1,12 @@
 step 1
 ------
-mkdir docs
-cd docs
-
+mkdir $APPDIR/docs
+cd $APPDIR/docs
 sphinx-quickstart
 
 step 2
 ------
-pip install sphinx-glpi-theme
-
+pip install sphinx-rtd-theme
 
 step 3
 ------

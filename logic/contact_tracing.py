@@ -5,7 +5,7 @@ from numpy import double
 from logic.compartments import Compartments
 from logic.disease_model import DiseaseModel
 from logic.transitions import Transitions
-from logic.settings import arg, DAYS, GAMMA, age_groups, R0
+from config.contact_settings import arg, DAYS, GAMMA, BETA, age_groups, R0
 # import graphviz
 
 
@@ -17,33 +17,32 @@ class ContactTracing(DiseaseModel):
     assumed to be in units of days as usual in epidemiology
     """
 
-    def __init__(self, _compartments: List[Compartments], _transitions: List[Transitions],
-                 _beta: float, _gamma: float):
+    def __init__(self, compartments: List[Compartments], value_a: float, value_b: float, value_c: float):
         """
         Initialize the run of the epidemic
         State and queue codes (transition event into this state)
         """
-        super().__init__(compartments=_compartments, transitions=_transitions, beta=_beta, gamma=_gamma)
-        self._num_comp = len(_compartments)
+        super().__init__(compartments, value_a, value_b, value_c)
+        self._num_comp = len(compartments)
 
     def solve(self, r0, t_vec, x_init: list):
         return super(ContactTracing, self).solve(r0, t_vec, x_init)
 
-    def result(self, arg: dict, days: int, r0):
-        return super(ContactTracing, self).result(arg, days, r0)
+    def result(self, days, r0):
+        return super(ContactTracing, self).result(days, r0)
     
     def equations(self, x, t, r0):
         try:
             dx = np.zeros(self._num_comp, dtype=double)
             s, e, i, r = x
-            beta = r0(t) * self._beta if callable(r0) else r0 * self._beta
+            beta = r0(t) * BETA if callable(r0) else r0 * BETA
             ne = beta * s * i
             # Time derivatives
 
             dx[0] = -ne
-            dx[1] = ne - self._beta * e
-            dx[2] = beta * e - self._gamma * i
-            dx[3] = self._gamma * i
+            dx[1] = ne - GAMMA * e
+            dx[2] = beta * e - GAMMA * i
+            dx[3] = GAMMA * i
             return dx
         except Exception as e:
             print('Error equations: {0}'.format(e))
@@ -52,11 +51,11 @@ class ContactTracing(DiseaseModel):
 
 if __name__ == "__main__":
     start_time = time.time()
-    susc = Compartments(name='susceptible')
-    expo = Compartments(name='exposed')
-    iinf = Compartments(name='infectious_symptoms')
-    rec = Compartments(name='recovered')
-    dead = Compartments(name='dead')
+    susc = Compartments(name="susceptible")
+    expo = Compartments(name="exposed")
+    iinf = Compartments(name="infectious_symptoms")
+    rec = Compartments(name="recovered")
+    dead = Compartments(name="dead")
     # susc_expo = Transitions(rate=0.2, probability=0.5, org=susc, dest=expo).value
 
     compartments = [susc, expo, iinf, rec]
@@ -65,10 +64,11 @@ if __name__ == "__main__":
     result = []
     for key, value in age_groups.items():
         dict_temp = {'age_group': key}
-        ct = ContactTracing(_compartments=compartments, _transitions=transitions, _gamma=GAMMA, _beta=value)
-        resp = ct.result(arg=arg, days=DAYS, r0=R0)
+        ct = ContactTracing(compartments=compartments, value_a=GAMMA, value_b=value, value_c=0.0)
+        resp = ct.result(days=DAYS, r0=R0)
         dict_temp.update({item['_name']: item['_result'] for item in resp})
         result.append(dict_temp)
+
 
     print(result)
     # Calculated Time processing

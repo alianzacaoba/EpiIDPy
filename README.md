@@ -1,4 +1,4 @@
-Susceptible-Infectious-Recovered Python (SIRPy)
+Epidemiology of infectious diseases in Python (EpilDPy)
 ==============================================
 The Susceptible-Infectious-Recovered Python (SIRPy) is a framework 
 designed to help scientists and public health officials create and 

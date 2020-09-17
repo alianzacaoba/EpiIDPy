@@ -7,21 +7,14 @@ from logic.transitions import Transitions
 
 
 class DiseaseModel(ABC):
+    """ Class used to represent an Disease Model"""
 
     def __init__(self, compartments: List[Compartments], value_a: float, value_b: float, value_c: float):
-        """
-            Init Disease Model with parameters.
-
-        Parameters
-        ----------
-            compartments : str
-                name of compartment.
-            transitions : list
-                List of transitions compartment between compartment.
-        Returns
-        -------
-            object
-                object disease model.
+        """ Init Disease Model with parameters.
+        :param compartments: name of compartment.
+        :type compartments: List
+        :returns: Object Disease model
+        :rtype: object
         """
         self._compartments = compartments
         self.value_a = value_a
@@ -29,38 +22,28 @@ class DiseaseModel(ABC):
         self.value_c = value_c
 
     def equations(self, x, t, r0):
-        """
-            Time derivative of the state vector.
-        Parameters
-        ----------
-            x : object
-                the state vector (array_like)
-            t : int
-                time (scalar)
-            r0 : float
-                the effective transmission rate, defaulting to a constant
-        Returns
-        -------
-            object
-                disease model equations.
+        """Time derivative of the state vector.
+        :param x: The compartment vector (array_like)
+        :type x: Object Compartments
+        :param t: time (scalar)
+        :type t: int
+        :param r0: The effective transmission rate, defaulting to a constant
+        :type r0: float
+        :returns: Disease model equations.
+        :rtype: object
         """
         pass
 
-    def solve(self, r0, t_vec, x_init: list):
-        """
-            Solve for i(t) and c(t) via numerical integration, given the time path for R0..
-        Parameters
-        ----------
-            r0 : double
-                rate force of infection
-            t_vec : int
-                time (scalar)
-            x_init : list
-                list of initial values each compartment
-        Returns
-        -------
-            dict
-                disease model equations.
+    def solve(self, x_init: list, time_vector, r0):
+        """Solve for dx(t) and d(t) via numerical integration, given the time path for R0.
+        :param x_init: List of initial values each compartment (float list)
+        :type x_init: List
+        :param time_vector:  time (scalar)
+        :type time_vector: int
+        :param r0: rate force of infection
+        :type r0: double
+        :returns: Disease model equations.
+        :rtype: dict
         """
         try:
             result = odeint(lambda x, t: self.equations(x, t, r0), x_init, t_vec)
@@ -74,25 +57,18 @@ class DiseaseModel(ABC):
             return None
 
     def result(self, days: int, r0: float):
-        """
-            Returns all values of the disease model.
-        Parameters
-        ----------
-            arg : dict
-                name and values of initial compartments
-            days : int
-                days of calculate
-            r0 : float
-                the effective transmission rate, defaulting to a constant
-        Returns
-        -------
-            dict
-                values by compartment.
+        """Returns all values of the disease model.
+        :param days: days of calculate
+        :type days: int
+        :param r0: the effective transmission rate, defaulting to a constant
+        :type r0: double
+        :returns: Values by compartment.
+        :rtype: dict
         """
         try:
-            val = [c.value for c in self._compartments]
-            t_vec = np.linspace(start=0, stop=days, num=days)
-            resp = self.solve(r0, t_vec, val)
+            compartments_values = [c.value for c in self._compartments]
+            time_vector = np.linspace(start=0, stop=days, num=days)
+            resp = self.solve(x_init=compartments_values, time_vector=time_vector, r0=r0)
             return resp
         except Exception as e:
             print('Error set_model: {0}'.format(e))

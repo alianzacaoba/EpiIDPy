@@ -8,13 +8,7 @@ from config.economic_settings import DAYS, prob, rate, N, Mm
 
 
 class EconomicReactivation(DiseaseModel):
-    """
-    Simulate stochastics economic reactivation
-    Object stochastics Network for SIR Models
-    All units in the simulator are in hours for numerical stability, though disease parameters are
-    assumed to be in units of days as usual in epidemiology
-    """
-
+    """Class used to represent an Economic Reactivation"""
     def __init__(self, _compartments: List[Compartments], value_a: float, value_b: float, value_c: float):
         """
         Initialize the run of the epidemic

@@ -10,17 +10,11 @@ from config.contact_settings import arg, DAYS, GAMMA, BETA, age_groups, R0
 
 
 class ContactTracing(DiseaseModel):
-    """
-    Simulate continuous-time SIRPy epidemics.
-    Object Oriented Bayesian Network for SIR Models
-    All units in the simulator are in hours for numerical stability, though disease parameters are
-    assumed to be in units of days as usual in epidemiology
-    """
+    """ Class used to represent an Contact Tracing disease model """
 
     def __init__(self, compartments: List[Compartments], value_a: float, value_b: float, value_c: float):
         """
-        Initialize the run of the epidemic
-        State and queue codes (transition event into this state)
+        Initialize the run of contact tracing disease model
         """
         super().__init__(compartments, value_a, value_b, value_c)
         self._num_comp = len(compartments)

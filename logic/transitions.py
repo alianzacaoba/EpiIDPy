@@ -2,7 +2,7 @@ from logic.compartments import Compartments
 
 
 class Transitions(object):
-
+    """Class used to represent an transitions by compartment"""
     def __init__(self, rate=0.0, probability=0.0, org=Compartments(), dest=Compartments()):
         self._rate = rate
         self._probability = probability

@@ -24,12 +24,19 @@ class NumpyArrayEncoder(JSONEncoder):
 
 
 class Utils(object):
+    """Class used to support tasks, activities, and process """
 
     def __init__(self):
         print('Utils class')
 
     @staticmethod
     def load_json(file: str):
+        """Load json file
+        :param file: name of file.
+        :type file: str
+        :returns: JSON object
+        :rtype: JSON
+        """
         try:
             result = []
             path = DIR_INPUT + file
@@ -47,6 +54,12 @@ class Utils(object):
 
     @staticmethod
     def save_json(file: str, data: dict):
+        """Save json file
+        :param file: name of file.
+        :type file: str
+        :returns: JSON file
+        :rtype: JSON file
+        """
         try:
             date_file = datetime.datetime.now().strftime("%Y-%m-%d_h%Hm%M")
             file_path = DIR_OUTPUT + "{0}_{1}.json".format(file, date_file)
@@ -66,6 +79,14 @@ class Utils(object):
 
     @staticmethod
     def save_scv(file: str, data: dict):
+        """Save CSV file
+        :param file: name of file.
+        :type file: str
+        :param data: Dict of data.
+        :type data: dict
+        :returns: CSV file
+        :rtype: CSV file
+        """
         try:
             date_file = datetime.datetime.now().strftime("%Y-%m-%d_h%Hm%M")
             file_path = DIR_OUTPUT + "{0}_{1}.csv".format(file, date_file)

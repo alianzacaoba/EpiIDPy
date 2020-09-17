@@ -9,6 +9,8 @@ from config.vaccine_setting import rate, time_comp, work_risk, age_groups, regio
 
 
 class VaccineCostEffectiveness(DiseaseModel):
+    """Class used to represent an Vaccine Cost Effectiveness"""
+
     def __init__(self, compartments: List[Compartments], value_a: float, value_b: float, value_c: float):
         super().__init__(compartments, value_a, value_b, value_c)
         self._num_comp = len(compartments)

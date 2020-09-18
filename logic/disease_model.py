@@ -46,7 +46,7 @@ class DiseaseModel(ABC):
         :rtype: dict
         """
         try:
-            result = odeint(lambda x, t: self.equations(x, t, r0), x_init, t_vec)
+            result = odeint(lambda x, t: self.equations(x, t, r0), x_init, time_vector)
             result = np.transpose(result)
             for k, _ in enumerate(result):
                 self._compartments[k].result = result[k]

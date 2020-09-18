@@ -19,8 +19,8 @@ class ContactTracing(DiseaseModel):
         super().__init__(compartments, value_a, value_b, value_c)
         self._num_comp = len(compartments)
 
-    def solve(self, r0, t_vec, x_init: list):
-        return super(ContactTracing, self).solve(r0, t_vec, x_init)
+    def solve(self, x_init: list, time_vector, r0):
+        return super(ContactTracing, self).solve(x_init, time_vector, r0)
 
     def result(self, days, r0):
         return super(ContactTracing, self).result(days, r0)
@@ -60,9 +60,8 @@ if __name__ == "__main__":
         dict_temp = {'age_group': key}
         ct = ContactTracing(compartments=compartments, value_a=GAMMA, value_b=value, value_c=0.0)
         resp = ct.result(days=DAYS, r0=R0)
-        dict_temp.update({item['_name']: item['_result'] for item in resp})
+        dict_temp.update({key: value for key, value in resp.items()})
         result.append(dict_temp)
-
 
     print(result)
     # Calculated Time processing

@@ -15,8 +15,8 @@ class VaccineCostEffectiveness(DiseaseModel):
         super().__init__(compartments, value_a, value_b, value_c)
         self._num_comp = len(compartments)
 
-    def solve(self, r0, t_vec, x_init: list):
-        return super(VaccineCostEffectiveness, self).solve(r0, t_vec, x_init)
+    def solve(self, x_init: list, time_vector, r0):
+        return super(VaccineCostEffectiveness, self).solve(x_init, time_vector, r0)
 
     def result(self, days: int, r0: float):
         return super(VaccineCostEffectiveness, self).result(days, r0)

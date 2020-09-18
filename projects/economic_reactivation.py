@@ -17,8 +17,8 @@ class EconomicReactivation(DiseaseModel):
         super().__init__(_compartments, value_a, value_b, value_c)
         self._num_comp = len(_compartments)
 
-    def solve(self, r0, t_vec, x_init: list):
-        return super(EconomicReactivation, self).solve(r0, t_vec, x_init)
+    def solve(self, x_init: list, time_vector, r0):
+        return super(EconomicReactivation, self).solve(x_init, time_vector, r0)
 
     def result(self, days: int, r0):
         return super(EconomicReactivation, self).result(days, r0)

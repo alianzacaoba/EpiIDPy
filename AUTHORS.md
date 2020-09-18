@@ -1,8 +1,9 @@
 # Epidemiology of infectious diseases in Python (EpilDPy)
 
-## Original Authors
+## EpilDPy Team
 
-- Edwin Puertas <eapuerta@gmail.com>
+- Edwin Puertas, Doctoral Research <eapuerta@gmail.com>
+- Angel Paternina-Caicedo, MD MSc <angel.paternina@gmail.com> 
 - Center for Excellence and Appropriation in Big Data and Data Analytics (CAOBA)
 
 ## Funded by

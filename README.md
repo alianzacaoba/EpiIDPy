@@ -1,6 +1,11 @@
 Epidemiology of infectious diseases in Python (EpilDPy)
-==============================================
-The Susceptible-Infectious-Recovered Python (SIRPy) is a framework 
+=======================================================
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+
+#Quick Links
+
+#Getting Started Using the Library
+The Epidemiology of infectious diseases in Python (EpilDPy)is a framework 
 designed to help scientists and public health officials create and 
 use models of emerging infectious diseases. This framework uses 
 mathematical models of diseases (based on differential equations) 
@@ -28,3 +33,20 @@ In relation to the main function, the following activities must be carried out:
         rec = Compartments(name='recovered')
 2.	Then the compartments type objects are assigned to a list.
 
+
+
+##Team
+
+- Edwin Puertas, Doctoral Research | Data and Computer Scientist <eapuerta@gmail.com>
+- Angel Paternina-Caicedo, MD MSc <angel.paternina@gmail.com> 
+- Center for Excellence and Appropriation in Big Data and Data Analytics (CAOBA) <http://alianzacaoba.co/>
+
+## Support by
+
+- Pontificia Universidad Javeriana <https://www.javeriana.edu.co/>
+- Universidad del Sinú | Seccional Cartagena <https://www.unisinucartagena.edu.co/en/>
+- Hospital Universitario San Ignacio <http://www.husi.org.co/inicio>
+
+### Funded by
+
+- Minciencias | Ministerio de Ciencia Tecnología e Innovación

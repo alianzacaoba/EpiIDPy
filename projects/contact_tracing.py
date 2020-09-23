@@ -53,7 +53,6 @@ if __name__ == "__main__":
     # susc_expo = Transitions(rate=0.2, probability=0.5, org=susc, dest=expo).value
 
     compartments = [susc, expo, iinf, rec]
-    transitions = []
 
     result = []
     for key, value in age_groups.items():

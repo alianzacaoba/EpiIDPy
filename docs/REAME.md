@@ -15,22 +15,39 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('../logic'))
 extensions = [
-'sphinx.ext.todo',
-'sphinx.ext.viewcode',
-'sphinx.ext.autodoc'
+    'sphinx.ext.autodoc',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.ifconfig',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.githubpages',
 ]
-import sphinx_glpi_theme
 
-html_theme = "glpi"
+html_theme = "alabaster"
 
-html_theme_path = sphinx_glpi_theme.get_html_themes_path()
+latex_elements = {
+    'papersize': 'letterpaper',
+    'pointsize': '10pt',
+    'preamble': '',
+    'figure_align': 'htbp'
+}
+latex_documents = [
+    (master_doc, 'EpilDPy.tex', 'The Epidemiology of infectious diseases in Python',
+     'Edwin Puertas', 'manual'),
+]
+
+man_pages = [
+    (master_doc, 'EpilDPy', 'The Epidemiology of infectious diseases in Python',
+     [author], 1)
+]
+texinfo_documents = [
+    (master_doc, 'EpilDPy', 'The Epidemiology of infectious diseases in Python',
+     author, 'Edwin Puertas', 'One line description of project.',
+     'Miscellaneous'),
+]
+
+
 
 step 4
-------
-sphinx-apidoc -f -o docs\source logic
-
-
-step 5
 ------
 cd docs
 make html;

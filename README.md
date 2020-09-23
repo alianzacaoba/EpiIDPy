@@ -18,10 +18,10 @@ the following activities must be performed.
 
 1.	Create the compartments that represent the model, defining instances of objects of type compartments, then assign 
 the name and finally assign the initial value of the compartments for example:<br />
-    `susc = Compartments(name='susceptible', value=0.0)`
-    `expo = Compartments(name='exposed', value=0.0)`
-    `inf = Compartments(name='infectious', value=0.0)`
-    `rec = Compartments(name='recovered', value=0.0)`
+    `susc = Compartments(name='susceptible', value=0.0)`<br />
+    `expo = Compartments(name='exposed', value=0.0)`<br />
+    `inf = Compartments(name='infectious', value=0.0)`<br />
+    `rec = Compartments(name='recovered', value=0.0)`<br />
 2.	Add compartment objects to a list, for instance: <br />
     `compartments = [susc, expo, iinf, rec]`
 3.	Import the general data associated with the equations calculations. For this they can use the load_json method 

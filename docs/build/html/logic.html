@@ -1,0 +1,260 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Compartments &#8212; EpilDPy 1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to SIRPy’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-logic.compartments">
+<span id="compartments"></span><h1>Compartments<a class="headerlink" href="#module-logic.compartments" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="logic.compartments.Compartments">
+<em class="property">class </em><code class="sig-prename descclassname">logic.compartments.</code><code class="sig-name descname">Compartments</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">value</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">result</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/logic/compartments.html#Compartments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.compartments.Compartments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class used to represent an Compartments disease model
+:Example: Compartments(name=’susceptible’, value=0.0)</p>
+<dl class="py method">
+<dt id="logic.compartments.Compartments.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#logic.compartments.Compartments.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the name of the compartment.
+:returns: name of compartment.
+:rtype: str</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="logic.compartments.Compartments.result">
+<em class="property">property </em><code class="sig-name descname">result</code><a class="headerlink" href="#logic.compartments.Compartments.result" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the result of the compartment.
+:returns: population by compartment.
+:rtype: List</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="logic.compartments.Compartments.value">
+<em class="property">property </em><code class="sig-name descname">value</code><a class="headerlink" href="#logic.compartments.Compartments.value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the value of the compartment.
+:returns: value by compartment.
+:rtype: float</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-logic.disease_model">
+<span id="disease-model"></span><h1>Disease Model<a class="headerlink" href="#module-logic.disease_model" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="logic.disease_model.DiseaseModel">
+<em class="property">class </em><code class="sig-prename descclassname">logic.disease_model.</code><code class="sig-name descname">DiseaseModel</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">compartments</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="#logic.compartments.Compartments" title="logic.compartments.Compartments">logic.compartments.Compartments</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">value_a</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></span></em>, <em class="sig-param"><span class="n">value_b</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></span></em>, <em class="sig-param"><span class="n">value_c</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/logic/disease_model.html#DiseaseModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.disease_model.DiseaseModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
+<p>Class used to represent an Disease Model</p>
+<dl class="py method">
+<dt id="logic.disease_model.DiseaseModel.equations">
+<code class="sig-name descname">equations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="n">r0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/logic/disease_model.html#DiseaseModel.equations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.disease_model.DiseaseModel.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time derivative of the state vector.
+:param x: The compartment vector (array_like)
+:type x: Object Compartments
+:param t: time (scalar)
+:type t: int
+:param r0: The effective transmission rate, defaulting to a constant
+:type r0: float
+:returns: Disease model equations.
+:rtype: object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="logic.disease_model.DiseaseModel.result">
+<code class="sig-name descname">result</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">days</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.8)">int</a></span></em>, <em class="sig-param"><span class="n">r0</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.8)">float</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/logic/disease_model.html#DiseaseModel.result"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.disease_model.DiseaseModel.result" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all values of the disease model.
+:param days: days of calculate
+:type days: int
+:param r0: the effective transmission rate, defaulting to a constant
+:type r0: double
+:returns: Values by compartment.
+:rtype: dict</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="logic.disease_model.DiseaseModel.solve">
+<code class="sig-name descname">solve</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x_init</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.8)">list</a></span></em>, <em class="sig-param"><span class="n">time_vector</span></em>, <em class="sig-param"><span class="n">r0</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/logic/disease_model.html#DiseaseModel.solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.disease_model.DiseaseModel.solve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Solve for dx(t) and d(t) via numerical integration, given the time path for R0.
+:param x_init: List of initial values each compartment (float list)
+:type x_init: List
+:param time_vector:  time (scalar)
+:type time_vector: int
+:param r0: rate force of infection
+:type r0: double
+:returns: Disease model equations.
+:rtype: dict</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-logic.utils">
+<span id="utils"></span><h1>Utils<a class="headerlink" href="#module-logic.utils" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="logic.utils.NumpyArrayEncoder">
+<em class="property">class </em><code class="sig-prename descclassname">logic.utils.</code><code class="sig-name descname">NumpyArrayEncoder</code><span class="sig-paren">(</span><em class="sig-param"><span class="o">*</span></em>, <em class="sig-param"><span class="n">skipkeys</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">ensure_ascii</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">check_circular</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">allow_nan</span><span class="o">=</span><span class="default_value">True</span></em>, <em class="sig-param"><span class="n">sort_keys</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">indent</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">separators</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/logic/utils.html#NumpyArrayEncoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.NumpyArrayEncoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">json.encoder.JSONEncoder</span></code></p>
+<dl class="py method">
+<dt id="logic.utils.NumpyArrayEncoder.default">
+<code class="sig-name descname">default</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">obj</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/logic/utils.html#NumpyArrayEncoder.default"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.NumpyArrayEncoder.default" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implement this method in a subclass such that it returns
+a serializable object for <code class="docutils literal notranslate"><span class="pre">o</span></code>, or calls the base implementation
+(to raise a <code class="docutils literal notranslate"><span class="pre">TypeError</span></code>).</p>
+<p>For example, to support arbitrary iterators, you could
+implement default like this:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iterable</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span>
+    <span class="c1"># Let the base class default method raise the TypeError</span>
+    <span class="k">return</span> <span class="n">JSONEncoder</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="logic.utils.Utils">
+<em class="property">class </em><code class="sig-prename descclassname">logic.utils.</code><code class="sig-name descname">Utils</code><a class="reference internal" href="_modules/logic/utils.html#Utils"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.Utils" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Class used to support tasks, activities, and process</p>
+<dl class="py method">
+<dt id="logic.utils.Utils.load_json">
+<em class="property">static </em><code class="sig-name descname">load_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/logic/utils.html#Utils.load_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.Utils.load_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load json file
+:param file: name of file.
+:type file: str
+:returns: JSON object
+:rtype: JSON</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="logic.utils.Utils.save_json">
+<em class="property">static </em><code class="sig-name descname">save_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">data</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/logic/utils.html#Utils.save_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.Utils.save_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save json file
+:param file: name of file.
+:type file: str
+:returns: JSON file
+:rtype: JSON file</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="logic.utils.Utils.save_scv">
+<em class="property">static </em><code class="sig-name descname">save_scv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.8)">str</a></span></em>, <em class="sig-param"><span class="n">data</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.8)">dict</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/logic/utils.html#Utils.save_scv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.Utils.save_scv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save CSV file
+:param file: name of file.
+:type file: str
+:param data: Dict of data.
+:type data: dict
+:returns: CSV file
+:rtype: CSV file</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">EpilDPy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Compartments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#module-logic.disease_model">Disease Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#module-logic.utils">Utils</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to SIRPy’s documentation!</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/logic.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

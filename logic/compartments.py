@@ -1,8 +1,7 @@
 class Compartments(object):
     """
     Class used to represent an Compartments disease model
-    :Example:
-        Compartments(name='susceptible', value=0.0)
+    :Example: Compartments(name='susceptible', value=0.0)
     """
 
     def __init__(self, name=None, value=None, result=None):
@@ -22,8 +21,7 @@ class Compartments(object):
 
     @property
     def name(self):
-        """
-        Returns the name of the compartment.
+        """ Returns the name of the compartment.
         :returns: name of compartment.
         :rtype: str
         """
@@ -31,8 +29,7 @@ class Compartments(object):
 
     @name.setter
     def name(self, name: str):
-        """
-        The name of the compartment is assigned.
+        """ The name of the compartment is assigned.
         :param name: name of compartment.
         :type: str
         """
@@ -40,8 +37,7 @@ class Compartments(object):
 
     @property
     def result(self):
-        """
-        Returns the result of the compartment.
+        """ Returns the result of the compartment.
         :returns: population by compartment.
         :rtype: List
         """
@@ -49,8 +45,7 @@ class Compartments(object):
 
     @result.setter
     def result(self, val: None):
-        """
-        The result of the compartment is assigned.
+        """ The result of the compartment is assigned.
         :param val: result of compartment.
         :type: list
         """
@@ -58,8 +53,7 @@ class Compartments(object):
 
     @property
     def value(self):
-        """
-        Returns the value of the compartment.
+        """ Returns the value of the compartment.
         :returns: value by compartment.
         :rtype: float
         """
@@ -67,16 +61,14 @@ class Compartments(object):
 
     @value.setter
     def value(self, val: float):
-        """
-        The value of the compartment is assigned.
+        """ The value of the compartment is assigned.
         :param val: value of compartment.
         :type: float
         """
         self._value = val
 
     def __str__(self):
-        """
-        Returns all values of the compartment.
+        """ Returns all values of the compartment.
         :returns: to_string Compartments object
         :rtype: str
         """

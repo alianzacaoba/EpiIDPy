@@ -1,11 +1,11 @@
 import csv
 import io
-import sys
+import numpy
 import json
 import datetime
-from operator import itemgetter
-
 import numpy as np
+from itertools import groupby
+from operator import itemgetter
 from numpy import double
 from json import JSONEncoder
 from root import DIR_INPUT, DIR_OUTPUT
@@ -53,10 +53,115 @@ class Utils(object):
             return None
 
     @staticmethod
+    def load_population(file: str, delimiter: str = ',', year: int = 2020) -> dict:
+        """Load Population file
+        :param file: name of file.
+        :type file: str
+        :param delimiter: delimiter
+        :type delimiter: str
+        :param year: year of population
+        :type year: int
+        :returns: List
+        :rtype: List
+        """
+        try:
+            out = []
+            file_path = DIR_INPUT + file + '.csv'
+            with open(file_path, newline='', encoding='utf-8-sig') as f:
+                reader = csv.DictReader(f, delimiter=delimiter)
+                for row in reader:
+                    out.append({str(k).lower().replace(' ', '_'): v for k, v in row.items()})
+            f.close()
+            group = {}
+            for key, _ in groupby(out, key=itemgetter('departamento', 'sigla', str(year))):
+                dep = key[0]
+                if key[0] not in group:
+                    group[dep] = {key[1]: double(key[2])}
+                else:
+                    val = dict(group[dep])
+                    val.update({key[1]: double(key[2])})
+                    group[dep] = val
+            return group
+        except Exception as e:
+            print('Error load_population: {0}'.format(e))
+            return dict()
+
+    @staticmethod
+    def load_contact_matrices(file: str, delimiter: str = ","):
+        """Load Contact Matrix file
+        :param file: name of file.
+        :type file: str
+        :param delimiter: delimiter
+        :type delimiter: str
+        :returns: List
+        :rtype: List
+        """
+        try:
+            results = []
+            file_path = DIR_INPUT + file + '.csv'
+            with open(file_path, 'r', newline='', encoding='utf-8-sig') as f:
+                reader = csv.reader(f, delimiter=delimiter)  # change contents to floats
+                next(reader)
+                for row in reader:  # each row is a list
+                    results.append(row)
+            f.close()
+            return np.array(results, dtype=float)
+        except Exception as e:
+            print('Error load_contact_matrices: {0}'.format(e))
+            return None
+
+    @staticmethod
+    def region_capacities(file: str, delimiter: str = ",") -> dict:
+        """Load region capacities
+        :param file: name of file.
+        :type file: str
+        :param delimiter: delimiter
+        :type delimiter: str
+        :returns: Dict of region capacities
+        :rtype: dict
+        """
+        try:
+            out = {}
+            file_path = DIR_INPUT + file + '.csv'
+            with open(file_path, newline='', encoding='utf-8-sig') as f:
+                reader = csv.reader(f, delimiter=delimiter)
+                next(reader)
+                for row in reader:
+                    out[row[0]] = int(row[1])
+            f.close()
+            return out
+        except Exception as e:
+            print('Error region_capacities: {0}'.format(e))
+            return dict()
+
+    @staticmethod
+    def priority(file: str, delimiter: str = ",") -> list:
+        """Load priority age group by department.
+        :param file: name of file.
+        :type file: str
+        :param delimiter: delimiter
+        :type delimiter: str
+        :returns: list of priority age group by department.
+        :rtype: list
+        """
+        try:
+            file_path = DIR_INPUT + file + '.csv'
+            with open(file_path, newline='', encoding='utf-8-sig') as f:
+                reader = csv.reader(f, delimiter=delimiter)
+                out = [int(i) for i in list(reader)[0]]
+            f.close()
+            return out
+        except Exception as e:
+            print('Error region_capacities: {0}'.format(e))
+            return list()
+
+    @staticmethod
     def save_json(file: str, data: dict):
         """Save json file
         :param file: name of file.
         :type file: str
+        :param data: Dict of data
+        :type data: dict
         :returns: JSON file
         :rtype: JSON file
         """
@@ -105,4 +210,3 @@ class Utils(object):
         except IOError as e:
             print('Error save_scv: {0}'.format(e))
             return None
-

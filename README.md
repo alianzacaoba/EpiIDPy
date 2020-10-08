@@ -12,6 +12,8 @@ evolution of a disease in time. Also, the framework is founded on an Object-Orie
 Software design pattern approaches in order to optimize the simulation processes of the models. 
 The following illustrates and describes the process of creating a EpilDPy type of model.
 
+![](./media/EpilDPy.png)
+
 To create a new model, you must instantiate the base object DiseaseModel and implement 
 the equations method and the main entry point main. To implement a new type model of **EpilDPy**, 
 the following activities must be performed.
@@ -36,7 +38,7 @@ Regarding the default values, if you want to install them, you must assign them 
 which defines the differential equations that the model will calculate. For this activity it is recommended to use 
 dictionaries to optimize the implementation of the equations. Here is an example of how you can implement 
 the equation function with an example of a SIR model with four compartments.
-![](./media/EpilDPy.png)
+![](./media/equations.png)
 6.	Finally, the result function must be executed with the parameters DAYS and R0. For example: <br />
     `resp = ct.result(days=DAYS, r0=R0)`
 <br />The result function returns a dictionary of compartments with the respective matrices, after executing the process 

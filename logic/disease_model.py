@@ -9,7 +9,7 @@ from logic.transitions import Transitions
 class DiseaseModel(ABC):
     """ Class used to represent an Disease Model"""
 
-    def __init__(self, compartments: List[Compartments], value_a: float, value_b: float, value_c: float):
+    def __init__(self, compartments: List[Compartments], r0: float = 0.0, value_b: float = 0.0, value_c: float = 0.0):
         """ Init Disease Model with parameters.
         :param compartments: name of compartment.
         :type compartments: List
@@ -17,11 +17,11 @@ class DiseaseModel(ABC):
         :rtype: object
         """
         self._compartments = compartments
-        self.value_a = value_a
+        self._r0 = r0
         self.value_b = value_b
         self.value_c = value_c
 
-    def equations(self, x, t, r0):
+    def equations(self, x, t, **kwargs):
         """Time derivative of the state vector.
         :param x: The compartment vector (array_like)
         :type x: Object Compartments
@@ -34,7 +34,7 @@ class DiseaseModel(ABC):
         """
         pass
 
-    def solve(self, x_init: list, time_vector, r0):
+    def __solve(self, x_init: list, time_vector, **kwargs):
         """Solve for dx(t) and d(t) via numerical integration, given the time path for R0.
         :param x_init: List of initial values each compartment (float list)
         :type x_init: List
@@ -46,7 +46,7 @@ class DiseaseModel(ABC):
         :rtype: dict
         """
         try:
-            result = odeint(lambda x, t: self.equations(x, t, r0), x_init, time_vector)
+            result = odeint(lambda x, t: self.equations(x, t, **kwargs), x_init, time_vector)
             result = np.transpose(result)
             for k, _ in enumerate(result):
                 self._compartments[k].result = result[k]
@@ -56,7 +56,7 @@ class DiseaseModel(ABC):
             print('Error solve: {0}'.format(e))
             return None
 
-    def result(self, days: int, r0: float):
+    def run(self, days: int, **kwargs):
         """Returns all values of the disease model.
         :param days: days of calculate
         :type days: int
@@ -68,7 +68,7 @@ class DiseaseModel(ABC):
         try:
             compartments_values = [c.value for c in self._compartments]
             time_vector = np.linspace(start=0, stop=days, num=days)
-            resp = self.solve(x_init=compartments_values, time_vector=time_vector, r0=r0)
+            resp = self.__solve(x_init=compartments_values, time_vector=time_vector, **kwargs)
             return resp
         except Exception as e:
             print('Error set_model: {0}'.format(e))

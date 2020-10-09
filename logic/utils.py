@@ -145,10 +145,12 @@ class Utils(object):
         :rtype: list
         """
         try:
+            out = []
             file_path = DIR_INPUT + file + '.csv'
             with open(file_path, newline='', encoding='utf-8-sig') as f:
-                reader = csv.reader(f, delimiter=delimiter)
-                out = [int(i) for i in list(reader)[0]]
+                reader = csv.DictReader(f, delimiter=delimiter)
+                for row in reader:
+                    out.append({str(k): v for k, v in row.items()})
             f.close()
             return out
         except Exception as e:

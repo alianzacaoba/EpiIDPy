@@ -20,31 +20,36 @@ class VaccinationDynamics(DiseaseModel):
         self.vaccine_capacities = Utils.region_capacities(file='region_capacities')
         self.priority_vaccine = Utils.priority(file='priority')
 
-    def __vaccine_assignment(self, age_group: List, vaccine_capacities: int, priority_vaccine: list) -> float:
+    def __vaccine_assignment(self, individuals: dict, vaccine_capacities: int, priority_vaccine: list) -> dict:
         try:
-            size_population = sum(age_group)
-            vaccine_assignment = np.zeros(size_population, dtype=double)
             total_candidate = vaccine_capacities
+            vaccine_assigment = dict()
             for pv in priority_vaccine:
-                vaccine_assignment[pv] = min(age_group[pv], total_candidate)
-                total_candidate -= vaccine_assignment[pv]
-
-            return vaccine_assignment
+                age_group, work_group, percent = pv  # Age group, Workgroup, Vaccination Percent
+                vac_age_group = vaccine_assigment.get(age_group, dict())
+                vac_age_group[work_group] = dict()
+                group = individuals[age_group][work_group]
+                vac_asig = min(round(sum(group) * percent), total_candidate)
+                for healthGroup in group.keys():
+                    vac_age_group[work_group][healthGroup] = vac_asig / sum(group)
+                    total_candidate -= round(vac_asig * group[healthGroup] / sum(group))
+                vaccine_assigment[age_group] = vac_age_group
+            return vaccine_assigment
         except Exception as e:
             print('Error vaccine_assignment: {0}'.format(e))
-            return 0.0
+            return {0: 0.0}
 
     def new_comparment(self, contact_matrix: numpy.matrix, age_group: list):
         print('VAsig')
 
     def equations(self, x, t, **kwargs):
         try:
-            age_group = kwargs.get('age_groups') if type(kwargs.get('age_groups')) is list else list()
+            age_groups = kwargs.get('age_groups') if type(kwargs.get('age_groups')) is list else list()
             vaccine_capacities = kwargs.get('vaccine_capacities') if type(kwargs.get('vaccine_capacities')) is int else 1
             priority_vaccine = kwargs.get('priority_vaccine') if type(kwargs.get('priority_vaccine')) is list else list()
             dx = np.zeros(self._num_comp, dtype=double)
             su, f_1, f_2, e, a, a_f, r_a, v_1, v_2 = x
-            va_sig = self.__vaccine_assignment(age_group=age_group,
+            va_sig = self.__vaccine_assignment(individuals=age_groups,
                                                vaccine_capacities=vaccine_capacities,
                                                priority_vaccine=priority_vaccine)
 

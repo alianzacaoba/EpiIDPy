@@ -53,7 +53,7 @@ class Utils(object):
             return None
 
     @staticmethod
-    def load_population(file: str, delimiter: str = ',', year: int = 2020) -> dict:
+    def population(file: str, delimiter: str = ',', year: int = 2020) -> dict:
         """Load Population file
         :param file: name of file.
         :type file: str
@@ -61,8 +61,8 @@ class Utils(object):
         :type delimiter: str
         :param year: year of population
         :type year: int
-        :returns: List
-        :rtype: List
+        :returns: Dictionary of population by department.
+        :rtype: dict
         """
         try:
             out = []
@@ -87,7 +87,32 @@ class Utils(object):
             return dict()
 
     @staticmethod
-    def load_contact_matrices(file: str, delimiter: str = ","):
+    def vaccine_population(year: int = 2020, scenario: int = 1, work_group: str = 'M', wr_percent: float = 0.1) -> dict:
+        """Load vaccine Population
+        :param year: year of population
+        :type year: int
+        :param wr_percent: risk group percentage
+        :type wr_percent: float
+        :param scenario: scenario to evaluate
+        :type scenario: int
+        :returns: dict vaccine population
+        :rtype: dict
+        """
+        try:
+            population = Utils.population(file='population', year=year)
+            priority_vaccine = Utils.priority(file='priority')
+            age_priority = {row['age_group']: float(row['percent']) for row in priority_vaccine
+                            if int(row['scenario']) == scenario and row['work_group'] == work_group}
+            out = {}
+            for dep, age_group in population.items():
+                out[dep] = {k: int((age_group[k] * wr_percent) * v) for k, v in age_priority.items()}
+            return out
+        except Exception as e:
+            print('Error vaccine_population: {0}'.format(e))
+            return dict()
+
+    @staticmethod
+    def contact_matrices(file: str, delimiter: str = ","):
         """Load Contact Matrix file
         :param file: name of file.
         :type file: str

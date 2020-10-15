@@ -15,15 +15,18 @@ class VaccinationDynamics(DiseaseModel):
     def __init__(self, _compartments: List[Compartments], r0: float, value_b: float, value_c: float):
         super().__init__(_compartments, r0, value_b, value_c)
         self._num_comp = len(_compartments)
-        self.population = Utils.load_population(file='population', year=2020)
-        self.total_matrix = Utils.load_contact_matrices(file='total_contact_matrix')
+        # self.population = Utils.population(file='population', year=2020)
+        self.total_matrix = Utils.contact_matrices(file='total_contact_matrix')
         self.vaccine_capacities = Utils.region_capacities(file='region_capacities')
-        self.priority_vaccine = Utils.priority(file='priority')
+        self.vaccine_population = Utils.vaccine_population(year=2020, scenario=1, work_group='M', wr_percent=0.20)
+        self.vaccine_population_2 = Utils.vaccine_population(year=2020, scenario=1, work_group='O', wr_percent=0.10)
+        self.new_candidate = 0
 
-    def __vaccine_assignment(self, individuals: dict, vaccine_capacities: int, priority_vaccine: list) -> dict:
+    def __vaccine_assignment(self, vaccine_population_1: dict, vaccine_population_2: dict,
+                             vaccine_capacities: int) -> dict:
         try:
-            total_candidate = vaccine_capacities
             vaccine_assigment = dict()
+            '''
             for pv in priority_vaccine:
                 age_group, work_group, percent = pv  # Age group, Workgroup, Vaccination Percent
                 vac_age_group = vaccine_assigment.get(age_group, dict())
@@ -34,24 +37,24 @@ class VaccinationDynamics(DiseaseModel):
                     vac_age_group[work_group][healthGroup] = vac_asig / sum(group)
                     total_candidate -= round(vac_asig * group[healthGroup] / sum(group))
                 vaccine_assigment[age_group] = vac_age_group
+            '''
             return vaccine_assigment
         except Exception as e:
             print('Error vaccine_assignment: {0}'.format(e))
             return {0: 0.0}
 
-    def new_comparment(self, contact_matrix: numpy.matrix, age_group: list):
-        print('VAsig')
-
     def equations(self, x, t, **kwargs):
         try:
-            age_groups = kwargs.get('age_groups') if type(kwargs.get('age_groups')) is list else list()
             vaccine_capacities = kwargs.get('vaccine_capacities') if type(kwargs.get('vaccine_capacities')) is int else 1
-            priority_vaccine = kwargs.get('priority_vaccine') if type(kwargs.get('priority_vaccine')) is list else list()
+            vaccine_population_1 = kwargs.get('vaccine_population_1') if type(
+                kwargs.get('vaccine_population_1')) is dict else dict()
+            vaccine_population_2 = kwargs.get('vaccine_population_2') if type(
+                kwargs.get('vaccine_population_2')) is dict else dict()
             dx = np.zeros(self._num_comp, dtype=double)
             su, f_1, f_2, e, a, a_f, r_a, v_1, v_2 = x
-            va_sig = self.__vaccine_assignment(individuals=age_groups,
-                                               vaccine_capacities=vaccine_capacities,
-                                               priority_vaccine=priority_vaccine)
+            va_sig = self.__vaccine_assignment(vaccine_population_1=vaccine_population_1,
+                                               vaccine_population_2=vaccine_population_2,
+                                               vaccine_capacities=vaccine_capacities)
 
             ds_dt = su * va_sig
             f1_dt = {1: -f_1 * va_sig,
@@ -106,14 +109,14 @@ if __name__ == "__main__":
     ct = VaccinationDynamics(_compartments=compartments, r0=3.0, value_b=0.0, value_c=0.0)
     result = {}
     setting = {'matrix': ct.total_matrix}
-    for dept, age_groups in ct.population.items():
-        setting.update({'age_groups': list(dict(age_groups).values()),
-                        'vaccine_capacities': ct.vaccine_capacities[dept],
-                        'priority': ct.priority_vaccine})
+    for dept, age_groups in ct.vaccine_population.items():
+        setting.update({'vaccine_population_1': dict(age_groups),
+                        'vaccine_population_2': ct.vaccine_population_2[dept],
+                        'vaccine_capacities': ct.vaccine_capacities[dept]})
         resp = ct.run(days=100, **setting)
 
-    #Utils.save_json('vaccine_cost_effectiveness', result)
-    #Utils.save_scv('vaccine_cost_effectiveness', result)
+    # Utils.save_json('vaccine_cost_effectiveness', result)
+    # Utils.save_scv('vaccine_cost_effectiveness', result)
     print(result)
 
 

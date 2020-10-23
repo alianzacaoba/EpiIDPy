@@ -15,29 +15,29 @@ class VaccinationDynamics(DiseaseModel):
     def __init__(self, _compartments: List[Compartments], r0: float, value_b: float, value_c: float):
         super().__init__(_compartments, r0, value_b, value_c)
         self._num_comp = len(_compartments)
-        # self.population = Utils.population(file='population', year=2020)
         self.total_matrix = Utils.contact_matrices(file='total_contact_matrix')
+        self.population = Utils.population(file='population', year=2020)
         self.vaccine_capacities = Utils.region_capacities(file='region_capacities')
-        self.vaccine_population = Utils.vaccine_population(year=2020, scenario=1, work_group='M', wr_percent=0.20)
-        self.vaccine_population_2 = Utils.vaccine_population(year=2020, scenario=1, work_group='O', wr_percent=0.10)
-        self.new_candidate = 0
+        self.priority_vaccine = Utils.priority_vaccine(file='priority', scenario=1)
 
-    def __vaccine_assignment(self, vaccine_population_1: dict, vaccine_population_2: dict,
-                             vaccine_capacities: int) -> dict:
+    def __vaccine_assignment(self, candidates: list, vaccine_capacities: int, priority_vaccine: dict) -> dict:
+        # Candidates: su, v1,f1,e,a,ra
         try:
             vaccine_assigment = dict()
-            '''
+            remaining = vaccine_capacities
             for pv in priority_vaccine:
-                age_group, work_group, percent = pv  # Age group, Workgroup, Vaccination Percent
+                age_group, work_group, risk = pv.values()  # Age group, Workgroup, Health risk
                 vac_age_group = vaccine_assigment.get(age_group, dict())
-                vac_age_group[work_group] = dict()
-                group = individuals[age_group][work_group]
-                vac_asig = min(round(sum(group) * percent), total_candidate)
+                vac_age_group[work_group] = vac_age_group.get(work_group, dict())
+                vac_age_group[work_group][risk] = dict()
+                group = candidates[age_group][work_group][risk]
+                vac_asig = min(sum(group), remaining)
                 for healthGroup in group.keys():
-                    vac_age_group[work_group][healthGroup] = vac_asig / sum(group)
-                    total_candidate -= round(vac_asig * group[healthGroup] / sum(group))
+                    vac_age_group[work_group][risk][healthGroup] = vac_asig / sum(group)
                 vaccine_assigment[age_group] = vac_age_group
-            '''
+                remaining -= round(vac_asig)
+                if remaining == 0:
+                    break
             return vaccine_assigment
         except Exception as e:
             print('Error vaccine_assignment: {0}'.format(e))
@@ -46,15 +46,13 @@ class VaccinationDynamics(DiseaseModel):
     def equations(self, x, t, **kwargs):
         try:
             vaccine_capacities = kwargs.get('vaccine_capacities') if type(kwargs.get('vaccine_capacities')) is int else 1
-            vaccine_population_1 = kwargs.get('vaccine_population_1') if type(
-                kwargs.get('vaccine_population_1')) is dict else dict()
-            vaccine_population_2 = kwargs.get('vaccine_population_2') if type(
-                kwargs.get('vaccine_population_2')) is dict else dict()
+            priority_vaccine = kwargs.get('priority_vaccine') if type(
+                kwargs.get('priority_vaccine')) is list else list
             dx = np.zeros(self._num_comp, dtype=double)
             su, f_1, f_2, e, a, a_f, r_a, v_1, v_2 = x
-            va_sig = self.__vaccine_assignment(vaccine_population_1=vaccine_population_1,
-                                               vaccine_population_2=vaccine_population_2,
-                                               vaccine_capacities=vaccine_capacities)
+            va_sig = self.__vaccine_assignment(candidates=[su, v_1, f_1, e, a, ra],
+                                               vaccine_capacities=vaccine_capacities,
+                                               priority_vaccine=priority_vaccine)[0]
 
             ds_dt = su * va_sig
             f1_dt = {1: -f_1 * va_sig,
@@ -72,14 +70,14 @@ class VaccinationDynamics(DiseaseModel):
                      2: rate['EPSILON_2'] * f_1 * va_sig}
 
             dx[0] = ds_dt
-            dx[1] = f1_dt[1] + f1_dt[2]
+            dx[1] = sum([vf for kf, vf in f1_dt.items()])
             dx[2] = f2_dt
             dx[3] = de_dt
             dx[4] = da_dt
             dx[5] = daf_dt
             dx[6] = dra_dt
-            dx[7] = v1_dt[1] + v1_dt[2] + v1_dt[3] + v1_dt[4]
-            dx[8] = v2_dt[1] + v2_dt[2]
+            dx[7] = sum([vv for kv, vv in v1_dt.items()])
+            dx[8] = sum([vv for kv, vv in v2_dt.items()])
             return dx
         except Exception as e:
             print('Error equations: {0}'.format(e))
@@ -87,6 +85,7 @@ class VaccinationDynamics(DiseaseModel):
 
 
 if __name__ == "__main__":
+
     compartments = []
     sus = Compartments(name='Susceptible', value=0.0)
     compartments.append(sus)
@@ -109,9 +108,8 @@ if __name__ == "__main__":
     ct = VaccinationDynamics(_compartments=compartments, r0=3.0, value_b=0.0, value_c=0.0)
     result = {}
     setting = {'matrix': ct.total_matrix}
-    for dept, age_groups in ct.vaccine_population.items():
-        setting.update({'vaccine_population_1': dict(age_groups),
-                        'vaccine_population_2': ct.vaccine_population_2[dept],
+    for dept, age_groups in ct.population.items():
+        setting.update({'priority_vaccine': ct.priority_vaccine,
                         'vaccine_capacities': ct.vaccine_capacities[dept]})
         resp = ct.run(days=100, **setting)
 

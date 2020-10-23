@@ -1,5 +1,7 @@
 import csv
 import io
+from functools import reduce
+
 import numpy
 import json
 import datetime
@@ -87,29 +89,27 @@ class Utils(object):
             return dict()
 
     @staticmethod
-    def vaccine_population(year: int = 2020, scenario: int = 1, work_group: str = 'M', wr_percent: float = 0.1) -> dict:
-        """Load vaccine Population
-        :param year: year of population
-        :type year: int
-        :param wr_percent: risk group percentage
-        :type wr_percent: float
-        :param scenario: scenario to evaluate
-        :type scenario: int
-        :returns: dict vaccine population
-        :rtype: dict
+    def priority_vaccine(file: str, delimiter: str = ",", scenario: int = 1) -> list:
+        """Load priority age group by department.
+        :param file: name of file.
+        :type file: str
+        :param delimiter: delimiter
+        :type delimiter: str
+        :returns: list of priority .
+        :rtype: list
         """
         try:
-            population = Utils.population(file='population', year=year)
-            priority_vaccine = Utils.priority(file='priority')
-            age_priority = {row['age_group']: float(row['percent']) for row in priority_vaccine
-                            if int(row['scenario']) == scenario and row['work_group'] == work_group}
-            out = {}
-            for dep, age_group in population.items():
-                out[dep] = {k: int((age_group[k] * wr_percent) * v) for k, v in age_priority.items()}
+            file_path = DIR_INPUT + file + '.csv'
+            with open(file_path, newline='', encoding='utf-8-sig') as f:
+                reader = csv.DictReader(f, delimiter=delimiter)
+                data = [row for row in reader if int(row['scenario']) == scenario]
+            f.close()
+            out = [{'age_group': key[0], 'work_group': key[1], 'health_risk': key[2]}
+                   for key, _ in groupby(data, key=itemgetter('age_group', 'work_group', 'health_risk'))]
             return out
         except Exception as e:
-            print('Error vaccine_population: {0}'.format(e))
-            return dict()
+            print('Error region_capacities: {0}'.format(e))
+            return list()
 
     @staticmethod
     def contact_matrices(file: str, delimiter: str = ","):
@@ -158,29 +158,6 @@ class Utils(object):
         except Exception as e:
             print('Error region_capacities: {0}'.format(e))
             return dict()
-
-    @staticmethod
-    def priority(file: str, delimiter: str = ",") -> list:
-        """Load priority age group by department.
-        :param file: name of file.
-        :type file: str
-        :param delimiter: delimiter
-        :type delimiter: str
-        :returns: list of priority age group by department.
-        :rtype: list
-        """
-        try:
-            out = []
-            file_path = DIR_INPUT + file + '.csv'
-            with open(file_path, newline='', encoding='utf-8-sig') as f:
-                reader = csv.DictReader(f, delimiter=delimiter)
-                for row in reader:
-                    out.append({str(k): v for k, v in row.items()})
-            f.close()
-            return out
-        except Exception as e:
-            print('Error region_capacities: {0}'.format(e))
-            return list()
 
     @staticmethod
     def save_json(file: str, data: dict):

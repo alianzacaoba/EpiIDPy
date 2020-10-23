@@ -17,13 +17,7 @@ class EconomicReactivation(DiseaseModel):
         super().__init__(_compartments, value_a, value_b, value_c)
         self._num_comp = len(_compartments)
 
-    def solve(self, x_init: list, time_vector, r0):
-        return super(EconomicReactivation, self).solve(x_init, time_vector, r0)
-
-    def result(self, days: int, r0):
-        return super(EconomicReactivation, self).result(days, r0)
-
-    def equations(self, x, t, r0):
+    def equations(self, x, t, **kwargs):
         try:
             dx = np.zeros(self._num_comp, dtype=double)
             s_oa, e_oa, a_oa, p_oa, i_oa, c_oa, h_oa, u_oa, d_oa, r_oa, \
@@ -155,6 +149,6 @@ if __name__ == "__main__":
     ct = EconomicReactivation(_compartments=compartments,
                               value_a=rate['GAMMA'],
                               value_b=rate['BETA'],
-                              value_c=0.0)
-    resp = ct.result(days=DAYS, r0=2.3)
+                              value_c=2.3)
+    resp = ct.run(days=DAYS)
     print(resp)

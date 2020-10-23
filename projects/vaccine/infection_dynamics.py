@@ -15,17 +15,13 @@ class InfectionDynamics(DiseaseModel):
     def __init__(self, _compartments: List[Compartments], r0: float, value_b: float, value_c: float):
         super().__init__(_compartments, r0, value_b, value_c)
         self._num_comp = len(_compartments)
-        self.population = Utils.load_population(file='population', year=2020)
-        self.total_matrix = Utils.load_contact_matrices(file='total_contact_matrix')
-
-    def new_comparment(self, contact_matrix: numpy.matrix, age_group: list):
-        print('VAsig')
+        self.population = Utils.population(file='population', year=2020)
 
     def equations(self, x, t, **setting):
         try:
             age_group = kwargs.get('age_group') if type(kwargs.get('age_group')) is list else list()
             dx = np.zeros(self._num_comp, dtype=double)
-            su, f_1, f_2, e, a, a_f, r_a, v_1, v_2 = x
+            s, f_1, f_2, e_e, e_f = x
 
             dx[0] = 1
 
@@ -49,7 +45,7 @@ if __name__ == "__main__":
     compartments.append(pre)
     ct = InfectionDynamics(_compartments=compartments, r0=3.0, value_b=0.0, value_c=0.0)
     result = {}
-    kwargs = {'matrix': ct.total_matrix}
+    kwargs = dict()
     for dept, age_groups in ct.population.items():
         kwargs.update({'age_groups': dict(age_groups).values()})
         resp = ct.run(days=100, **kwargs)

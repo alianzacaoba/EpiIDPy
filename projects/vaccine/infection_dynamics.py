@@ -1,12 +1,10 @@
-from datetime import time
-import numpy
 from typing import List
 from numpy import double
 from pandas import np
+
 from logic.compartments import Compartments
 from logic.disease_model import DiseaseModel
 from logic.utils import Utils
-from config.vaccine_setting import rate
 
 
 class InfectionDynamics(DiseaseModel):
@@ -50,7 +48,7 @@ if __name__ == "__main__":
         kwargs.update({'age_groups': dict(age_groups).values()})
         resp = ct.run(days=100, **kwargs)
 
-    #Utils.save_json('vaccine_cost_effectiveness', result)
+    # Utils.save_json('vaccine_cost_effectiveness', result)
     #Utils.save_scv('vaccine_cost_effectiveness', result)
     print(result)
 

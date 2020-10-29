@@ -1,10 +1,9 @@
 import numpy as np
 from typing import List
 from numpy import double
+from config.economic_settings import DAYS, prob, rate, N, Mm
 from logic.compartments import Compartments
 from logic.disease_model import DiseaseModel
-from logic.transitions import Transitions
-from config.economic_settings import DAYS, prob, rate, N, Mm
 
 
 class EconomicReactivation(DiseaseModel):

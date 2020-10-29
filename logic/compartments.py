@@ -4,7 +4,7 @@ class Compartments(object):
     :Example: Compartments(name='susceptible', value=0.0)
     """
 
-    def __init__(self, name=None, value=None, result=None):
+    def __init__(self, name: str = None, value: float = 0.0, result=None):
         """ Compartments constructor object.
         :param name: name of compartment.
         :type name: str
@@ -16,7 +16,7 @@ class Compartments(object):
         :rtype: object
         """
         self._name = 'default_name' if name is None else name
-        self._value = 0.0 if value is None else value
+        self._value = value
         self._result = 0.0 if result is None else result
 
     @property

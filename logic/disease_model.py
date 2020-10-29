@@ -3,7 +3,6 @@ from typing import List
 from pandas import np
 from scipy.integrate import odeint
 from logic.compartments import Compartments
-from logic.transitions import Transitions
 
 
 class DiseaseModel(ABC):
@@ -27,8 +26,6 @@ class DiseaseModel(ABC):
         :type x: Object Compartments
         :param t: time (scalar)
         :type t: int
-        :param r0: The effective transmission rate, defaulting to a constant
-        :type r0: float
         :returns: Disease model equations.
         :rtype: object
         """
@@ -40,12 +37,11 @@ class DiseaseModel(ABC):
         :type x_init: List
         :param time_vector:  time (scalar)
         :type time_vector: int
-        :param r0: rate force of infection
-        :type r0: double
         :returns: Disease model equations.
         :rtype: dict
         """
         try:
+            # http://www.scholarpedia.org/article/Odeint_library
             result = odeint(lambda x, t: self.equations(x, t, **kwargs), x_init, time_vector)
             result = np.transpose(result)
             for k, _ in enumerate(result):

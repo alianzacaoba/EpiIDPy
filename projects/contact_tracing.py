@@ -1,9 +1,8 @@
-from timeit import default_timer as timer
-from datetime import timedelta
+import datetime
+import time
 import numpy as np
 from typing import List
 from numpy import double
-from config.contact_settings import DAYS, GAMMA, BETA
 from logic.compartments import Compartments
 from logic.disease_model import DiseaseModel
 from logic.utils import Utils
@@ -18,7 +17,7 @@ class ContactTracing(DiseaseModel):
         """
         super().__init__(_compartments, r0=r0, value_b=value_b, value_c=value_c)
         self.population = Utils.population(file='population', year=2020)
-        self.contact_matrices = Utils.contact_matrices(file='total_contact_matrix')
+        self.contact_matrices = Utils.contact_matrices(file='contact_matrix')
         self._num_comp = len(_compartments)
 
     def equations(self, x, t, **kwargs):
@@ -30,83 +29,79 @@ class ContactTracing(DiseaseModel):
             age_groups = kwargs.get('age_groups') if type(kwargs.get('age_groups')) is dict() else dict()
 
             beta = kwargs.get('beta') if type(kwargs.get('beta')) is float else 1.0
-            delta = kwargs.get('delta') if type(kwargs.get('delta')) is float else 1.0
             epsilon = kwargs.get('epsilon') if type(kwargs.get('epsilon')) is float else 1.0
-            mi = kwargs.get('mi') if type(kwargs.get('mi')) is float else 1.0
-            ma = kwargs.get('ma') if type(kwargs.get('ma')) is float else 1.0
             fi = kwargs.get('fi') if type(kwargs.get('fi')) is float else 1.0
+            mi = kwargs.get('mi') if type(kwargs.get('mi')) is float else 1.0
+            hh = kwargs.get('h') if type(kwargs.get('h')) is float else 1.0
+            tt = kwargs.get('tt') if type(kwargs.get('tt')) is float else 1.0
+            delta = kwargs.get('delta') if type(kwargs.get('delta')) is float else 1.0
+            ma = kwargs.get('ma') if type(kwargs.get('ma')) is float else 1.0
             alfa = kwargs.get('alfa') if type(kwargs.get('alfa')) is float else 1.0
             ceta = kwargs.get('ceta') if type(kwargs.get('ceta')) is float else 1.0
             gg = kwargs.get('g') if type(kwargs.get('g')) is float else 1.0
-            pa = kwargs.get('pa') if type(kwargs.get('pa')) is float else 1.0
             uu = kwargs.get('u') if type(kwargs.get('u')) is float else 1.0
-            hh = kwargs.get('h') if type(kwargs.get('h')) is float else 1.0
             pi = kwargs.get('pi') if type(kwargs.get('pi')) is float else 1.0
             sigma = kwargs.get('sigma') if type(kwargs.get('sigma')) is float else 1.0
             zz = kwargs.get('z') if type(kwargs.get('z')) is float else 1.0
             tao = kwargs.get('tao') if type(kwargs.get('tao')) is float else 1.0
             omega = kwargs.get('omega') if type(kwargs.get('omega')) is float else 1.0
 
-            s_q, e_q, p_q, i_q, a_q, r_q = x
-            s_qt, e_qt, p_qt, i_qt, a_qt, r_qt = x
-            s, e, p, ii, i, a, r, c, h, u = x
+            s_toa, e_toa, p_toa, i_toa, a_toa, r_toa = x
+            s_oa, e_oa, p_oa, ii_oa, i_oa, a_oa, r_oa, c_oa, h_oa, u_oa = x
 
-            q = s_q + e_q + a_q + p_q + r_q
-            tt = s_qt + e_qt + a_qt + p_qt + r_qt
-            n = q + tt + s + e + a + p + r + ii + i + c + h + u
+            i = 1.0  # es un compartimento o un valor?
+            i_i = 1.0  # es un compartimento o un valor?
+            t_oa = s_toa + e_toa + a_toa + p_toa + r_toa
+            n = t_oa + s_oa + e_oa + a_oa + p_oa + r_oa + ii_oa + i_oa + c_oa + h_oa
 
-            f = contact_matrices * (beta * (i + a + p)) / n
-            F = f * ((epsilon * (s_qt + s_q)) + s)
-            f_t = F * tt * (ii + i)
+            f = (beta * contact_matrices * (i_oa + a_oa + p_oa)) / n
+            f_g = f * (epsilon * s_toa) + s_oa
+            f_toa = f_g * tt * zz * (ii_oa + i_oa)
 
-            ds_qt = {1: fi * s_qt, 2: -epsilon * f * s_qt, 3: -mi * s_qt, 4: ma * s_qt, 5: f_t * s_qt}
-            ds_q = {1: fi * s_q, 2: -epsilon * f * s_q, 3: -mi * s_q, 4: ma * s_q, 5: h * s, 6: f_t * s_q}
-            ds = {1: fi * s, 2: -f * s, 3: -mi * s, 4: ma * s, 5: h * s}
+            ds_toa = {1: fi * s_toa, 2: -epsilon * f * s_toa, 3: -mi * s_toa, 4: f_toa * s_toa, 5: -hh * s_toa}
+            ds_oa = {1: fi * s_oa, 2: -f * s_oa, 3: -mi * s_oa, 4: hh * s_oa}
 
-            de_qt = {1: f * s_qt, 2: f * s_q, 3: -alfa * e_q, 4: -mi * e_q, 5: ma * e_q, 6: f_t * e_qt}
-            de_q = {1: f * s_qt, 2: f * s_q, 3: -alfa * e_q, 4: -mi * e_q, 5: ma * e_q, 6: h * e, 7: f_t * e_q}
-            de = {1: f * s, 2: -alfa * s, 3: -mi * e, 4: ma * e, 5: -h * e, 6: -ma * e_q, 7: -h * e}
+            de_toa = {1: f * s_toa, 2: -alfa * e_oa, 3: -mi * e_toa, 4: f_toa * e_toa, 5: -hh * e_toa}
+            de_oa = {1: f * s_oa, 2: -alfa * s_oa, 3: -mi * e_oa, 4: -h_oa * e_oa, 5: -hh * e_toa}
 
-            da = {1: alfa * (1 - gg) * e, 2: -ceta * a, 3: -mi * a, 4: ma * a, 5: -h * a}
-            da_qt = {1: alfa * (1 - gg) * e_q, 2: -ceta * a_q, 3: -mi * a_q, 4: ma * a_q, 5: f_t * a_qt}
-            da_q = {1: alfa * (1 - gg) * e_q, 2: -ceta * a_q, 3: -mi * a_q, 4: ma * a_q, 5: -h * a, 6: f_t * a_q}
+            da_toa = {1: alfa * (1 - gg) * e_oa, 2: -ceta * a_toa, 3: -mi * a_toa,
+                      4: ma * a_toa, 5: f_toa * a_toa, 6: -hh * a_toa}
+            da_oa = {1: alfa * (1 - gg) * e_oa, 2: -ceta * a_oa, 3: -mi * a_oa, 4: ma * a_oa, 5: hh * a_oa}
 
-            dp_qt = {1: alfa * gg * e_q, 2: -delta * p_q, 3: -mi * p_q, 4: ma * p_q, 5: f_t * p_qt}
-            dp_q = {1: alfa * gg * e_q, 2: -delta * p_q, 3: -mi * p_q, 4: ma * p_q, 5: h * p, 6: f_t * p_q}
-            dp = {1: alfa * gg * e, 2: -delta * p, 3: -mi * p, 4: ma * p, 5: -h * p}
+            dp_toa = {1: alfa * gg * e_oa, 2: -delta * p_toa, 3: -mi * p_toa,
+                      4: ma * p_toa, 5: f_toa * p_toa, 6: -hh * p_toa}
+            dp_oa = {1: alfa * gg * e_oa, 2: -delta * p_oa, 3: -mi * p_oa,
+                     4: ma * p_oa, 5: -hh * p_toa}
 
-            di_i = {1: delta * pa * p, 2: delta * p_q, 3: -pi * ii, 4: ma * i, 5: F * tt * zz * i}
-            di = {1: delta * (1 - pa) * p, 2: -pi * i, 3: ma * i, 4: F * tt * ii}
+            di_ioa = {1: alfa * p_oa, 2: alfa * p_toa, 3: -pi * i_i, 4: f_g * tt * zz * ii_oa}
+            di_oa = {1: alfa * p_oa, 2: -pi * i, 3: f_g * tt * zz * i_oa}
 
-            dc = {1: 2 * pi * (1 - (uu + hh)) * (ii + i), 2: sigma * c}
-            dh = {1: 2 * pi * h * (ii + i), 2: tao * h}
-            du = {1: 2 * pi * h * (ii + i), 2: omega * h}
-            dd = {1: sigma * mi * c, 2: tao * mi * h, 3: omega * mi * u}
-            dr_q = {1: ceta * a, 2: ma * r_q, 3: F * r_q}
-            dr_qt = {1: ceta * a, 2: ma * r_q, 3: h * r, 4: F * r_q}
-            dr = {1: sigma * (1 - mi) * c, 2: tao * (1 - mi) * h, 3: omega * (1 - mi) * u, 4: ma * r, 5: h * r }
+            dc_oa = {1: 2 * pi * (1 - (uu + hh)) * (i_i + i), 2: sigma * c_oa}
+            dh_oa = {1: 2 * pi * hh * (i_i + i), 2: -tao * h_oa}
 
-            dx[0] = sum([vs for ks, vs in ds_qt.items()])
-            dx[1] = sum([vs for ks, vs in ds_q.items()])
-            dx[2] = sum([vs for ks, vs in ds.items()])
-            dx[3] = sum([ve for ke, ve in de_qt.items()])
-            dx[4] = sum([ve for ke, ve in de_q.items()])
-            dx[5] = sum([ve for ke, ve in de.items()])
-            dx[6] = sum([va for ka, va in da.items()])
-            dx[7] = sum([va for ka, va in da_qt.items()])
-            dx[8] = sum([va for ka, va in da_q.items()])
-            dx[9] = sum([vp for kp, vp in dp_qt.items()])
-            dx[10] = sum([vp for kp, vp in dp_q.items()])
-            dx[11] = sum([vp for kp, vp in dp.items()])
-            dx[12] = sum([vi for ki, vi in di_i.items()])
-            dx[13] = sum([vi for ki, vi in di.items()])
-            dx[14] = sum([vc for kc, vc in dc.items()])
-            dx[15] = sum([vh for kh, vh in dh.items()])
-            dx[16] = sum([vu for ku, vu in du.items()])
-            dx[17] = sum([vd for kd, vd in dd.items()])
-            dx[18] = sum([vr for kr, vr in dr_q.items()])
-            dx[19] = sum([vr for kr, vr in dr_qt.items()])
-            dx[20] = sum([vr for kr, vr in dr.items()])
+            du_oa = {1: 2 * pi * uu * (i_i + i), 2: -omega * u_oa}
+            dd_oa = {1: sigma * mi * c_oa, 2: tao * mi * hh, 3: omega * mi * uu}
+
+            dr_toa = {1: ceta * a_oa, 2: f_toa * r_toa, 3: -hh * r_toa}
+            dr_oa = {1: sigma * (1 - mi) }
+
+            dx[0] = sum([vs for ks, vs in ds_toa.items()])
+            dx[1] = sum([vs for ks, vs in ds_oa.items()])
+            dx[2] = sum([vs for ks, vs in de_toa.items()])
+            dx[3] = sum([ve for ke, ve in de_oa.items()])
+            dx[4] = sum([ve for ke, ve in da_toa.items()])
+            dx[5] = sum([ve for ke, ve in da_oa.items()])
+            dx[6] = sum([vp for kp, vp in dp_toa.items()])
+            dx[7] = sum([vp for kp, vp in dp_oa.items()])
+            dx[8] = sum([vi for ki, vi in di_ioa.items()])
+            dx[9] = sum([vi for ki, vi in di_oa.items()])
+            dx[10] = sum([vc for kc, vc in dc_oa.items()])
+            dx[11] = sum([vh for kh, vh in dh_oa.items()])
+            dx[12] = sum([vu for ku, vu in du_oa.items()])
+            dx[13] = sum([vd for kd, vd in dd_oa.items()])
+            dx[14] = sum([vr for kr, vr in dr_toa.items()])
+            dx[15] = sum([vr for kr, vr in dr_oa.items()])
+
             return dx
         except Exception as e:
             print('Error equations: {0}'.format(e))
@@ -114,63 +109,49 @@ class ContactTracing(DiseaseModel):
 
 
 if __name__ == "__main__":
-    start = timer()
+    start_processing_s = time.process_time()
+    start_time = datetime.datetime.now()
     compartments = []
-    s_q = Compartments(name="Susceptible in quarantine", value=0.0)
-    compartments.append(s_q)
-    e_q = Compartments(name="Exposed in quarantine", value=0.0)
-    compartments.append(e_q)
-    p_q = Compartments(name="Pre-symptomatic in quarantine", value=0.0)
-    compartments.append(p_q)
-    i_q = Compartments(name="Infectious in quarantine", value=0.0)
-    compartments.append(i_q)
-    a_q = Compartments(name="Asymptomatic in quarantine", value=0.0)
-    compartments.append(a_q)
-    r_q = Compartments(name="recovered in quarantine", value=0.0)
-    compartments.append(r_q)
+    s_toa = Compartments(name="Susceptible traced", value=0.0)
+    compartments.append(s_toa)
+    e_toa = Compartments(name="Exposed traced", value=0.0)
+    compartments.append(e_toa)
+    a_toa = Compartments(name="Asymptomatic traced", value=0.0)
+    compartments.append(a_toa)
+    p_toa = Compartments(name="Pre-symptomatic traced", value=0.0)
+    compartments.append(p_toa)
+    r_toa = Compartments(name="recovered traced", value=0.0)
+    compartments.append(r_toa)
 
-    s_qt = Compartments(name="Susceptible in quarantine traced", value=0.0)
-    compartments.append(s_qt)
-    e_qt = Compartments(name="Exposed in quarantine traced", value=0.0)
-    compartments.append(e_qt)
-    p_qt = Compartments(name="Pre-symptomatic in quarantine traced", value=0.0)
-    compartments.append(p_qt)
-    i_qt = Compartments(name="Infectious in quarantine traced", value=0.0)
-    compartments.append(i_qt)
-    a_qt = Compartments(name="Asymptomatic in quarantine traced", value=0.0)
-    compartments.append(a_qt)
-    r_qt = Compartments(name="recovered in quarantine traced", value=0.0)
-    compartments.append(r_qt)
-
-    s = Compartments(name="Susceptible", value=0.0)
-    compartments.append(s)
-    e = Compartments(name="Exposed", value=0.0)
-    compartments.append(e)
-    p = Compartments(name="Pre-symptomatic ", value=0.0)
-    compartments.append(p)
-    i = Compartments(name="Infectious", value=0.0)
-    compartments.append(i)
-    ii = Compartments(name="Infectious isolate", value=0.0)
-    compartments.append(ii)
-    a = Compartments(name="Asymptomatic", value=0.0)
-    compartments.append(a)
-    c = Compartments(name="Inhomecare-Isolated ", value=0.0)
-    compartments.append(c)
-    h = Compartments(name="Isolated-hospitalization", value=0.0)
-    compartments.append(h)
-    u = Compartments(name="Isolated-CriticalCare", value=0.0)
-    compartments.append(u)
-    r = Compartments(name="recovered", value=0.0)
-    compartments.append(r)
-    d = Compartments(name="dead", value=0.0)
-    compartments.append(d)
+    s_oa = Compartments(name="Susceptible", value=0.0)
+    compartments.append(s_oa)
+    e_oa = Compartments(name="Exposed", value=0.0)
+    compartments.append(e_oa)
+    a_oa = Compartments(name="Asymptomatic", value=0.0)
+    compartments.append(a_oa)
+    p_oa = Compartments(name="Pre-symptomatic ", value=0.0)
+    compartments.append(p_oa)
+    r_oa = Compartments(name="recovered", value=0.0)
+    compartments.append(r_oa)
+    ii_oa = Compartments(name="Infectious isolate", value=0.0)
+    compartments.append(ii_oa)
+    i_oa = Compartments(name="Infectious", value=0.0)
+    compartments.append(i_oa)
+    c_oa = Compartments(name="Inhomecare-Isolated ", value=0.0)
+    compartments.append(c_oa)
+    h_oa = Compartments(name="Isolated Hospitalization", value=0.0)
+    compartments.append(h_oa)
+    u_oa = Compartments(name="Isolated-CriticalCare", value=0.0)
+    compartments.append(u_oa)
 
     ct = ContactTracing(_compartments=compartments, r0=0.0)
     result = dict()
+
     kwargs = {'fi': 0.4, 'delta': 5.0, 'epsilon': 0.0, 'mi': 0.0, 'ma': 0.0,
               'beta': 0.0, 'ceta': 0.0, 'pa': 0.0, 'g': 0.0, 'u': 0.0,
               'h': 0.0, 'pi': 0.0, 'sigma': 0.0, 't': 0.0, 'z': 0.0,
               'tao': 0.0, 'omega': 0.0, 'contact_matrices': ct.contact_matrices}
+
     for dept, age_groups in ct.population.items():
         temp = dict()
         for age, value in dict(age_groups).items():
@@ -178,7 +159,11 @@ if __name__ == "__main__":
             resp = ct.run(days=100, **kwargs)
             temp[age] = resp
         result[dept] = temp
-    print(result)
-    Utils.save('contact_tracing', result)
-    end = timer()
-    print('Time processing: {0}'.format(timedelta(seconds=end - start)))
+
+    end_processing_s = time.process_time()
+    end_processing_ns = time.process_time_ns
+    end_time = datetime.datetime.now()
+    print('Performance: {0}'.format(end_processing_s - start_processing_s))
+    time_diff = (end_time - start_time)
+    execution_time = time_diff.total_seconds() * 1000
+    print('Execution Time: {0} milliseconds'.format(execution_time))

@@ -2,11 +2,12 @@ import csv
 import datetime
 import io
 import json
+import operator
+import itertools
 import numpy as np
 import pandas as pd
 from itertools import groupby
 from json import JSONEncoder
-from operator import itemgetter
 from numpy import double
 from root import DIR_INPUT, DIR_OUTPUT
 
@@ -67,20 +68,190 @@ class Utils(object):
             with open(file_path, newline='', encoding='utf-8-sig') as f:
                 reader = csv.DictReader(f, delimiter=delimiter)
                 for row in reader:
-                    out.append({str(k).lower().replace(' ', '_'): v for k, v in row.items()})
+                    out.append({str(k).strip(): v for k, v in row.items()})
             f.close()
             group = {}
-            for key, _ in groupby(out, key=itemgetter('departamento', 'sigla', str(year))):
+            for key, _ in groupby(out, key=operator.itemgetter('DEPARTMENT', 'AGE GROUP', str(year))):
                 dep = key[0]
+                value = double(key[2].replace(',', ''))
                 if key[0] not in group:
-                    group[dep] = {key[1]: double(key[2])}
+                    group[dep] = {key[1]: value}
                 else:
-                    val = dict(group[dep])
-                    val.update({key[1]: double(key[2])})
-                    group[dep] = val
+                    tmp = dict(group[dep])
+                    tmp[key[1]] = value
+                    group[dep] = tmp
             return group
         except Exception as e:
             print('Error load_population: {0}'.format(e))
+            return dict()
+
+    @staticmethod
+    def initial_population(file: str, delimiter: str = ',') -> dict:
+        """Load Population file
+        :param file: name of file.
+        :type file: str
+        :param delimiter: delimiter
+        :type delimiter: str
+        :param year: year of population
+        :type year: int
+        :returns: Dictionary of population by department.
+        :rtype: dict
+        """
+        try:
+            result = {}
+            file_path = DIR_INPUT + file + '.csv'
+            with open(file_path, newline='', encoding='utf-8-sig') as f:
+                reader = csv.DictReader(f, delimiter=delimiter)
+                data = [i for i in reader]
+                d = sorted(data, key=operator.itemgetter('DEPARTMENT', 'AGE_GROUP', 'WORK_GROUP', 'HEALTH_GROUP'))
+                out = {}
+                for key, v in groupby(d, key=operator.itemgetter('DEPARTMENT')):
+                    if key not in out:
+                        out[key] = list(v)
+                    else:
+                        tmp = list(out[key])
+                        out[key] = tmp.extend(v)
+
+                for dept, rows in out.items():
+                    age_dict = {}
+                    for row in rows:
+                        age_group = str(row['AGE_GROUP'])
+                        work_group = str(row['WORK_GROUP'])
+                        health_group = str(row['HEALTH_GROUP'])
+                        population = int(row['POPULATION'])
+                        if age_group not in age_dict:
+                            age_dict[age_group] = {work_group: {health_group: population}}
+                        else:
+                            value_work = dict(age_dict[age_group])
+                            if work_group not in value_work:
+                                value_work[work_group] = {health_group: population}
+                            else:
+                                value_heath = value_work[work_group]
+                                if health_group not in value_heath:
+                                    value_heath[health_group] = population
+                                value_work[work_group] = value_heath
+                            age_dict[age_group] = value_work
+                    result[dept] = age_dict
+                # print(result)
+            f.close()
+            return result
+        except Exception as e:
+            print('Error initial_population: {0}'.format(e))
+            return dict()
+
+    @staticmethod
+    def total_population(file: str, delimiter: str = ',') -> dict:
+        """Load Population file
+        :param file: name of file.
+        :type file: str
+        :param delimiter: delimiter
+        :type delimiter: str
+        :param year: year of population
+        :type year: int
+        :returns: Dictionary of population by department.
+        :rtype: dict
+        """
+        try:
+            result = {}
+            file_path = DIR_INPUT + file + '.csv'
+            with open(file_path, newline='', encoding='utf-8-sig') as f:
+                reader = csv.DictReader(f, delimiter=delimiter)
+                data = [i for i in reader]
+                d = sorted(data, key=operator.itemgetter('DEPARTMENT', 'AGE_GROUP', 'WORK_GROUP', 'HEALTH_GROUP'))
+                out = {}
+                for key, v in groupby(d, key=operator.itemgetter('DEPARTMENT')):
+                    if key not in out:
+                        out[key] = list(v)
+                    else:
+                        tmp = list(out[key])
+                        out[key] = tmp.extend(v)
+                for dept, rows in out.items():
+                    total = 0.0
+                    for row in rows:
+                        population = int(row['POPULATION'])
+                        total += population
+                    result[dept] = total
+            f.close()
+            return result
+        except Exception as e:
+            print('Error initial_population: {0}'.format(e))
+            return dict()
+
+    @staticmethod
+    def probabilities(file: str, delimiter: str = ',', parameter: str = 'InitialSus', filter: str = 'BASE_VALUE') -> dict:
+        """Load probabilities file
+        :param file: name of file.
+        :type file: str
+        :param delimiter: delimiter
+        :type delimiter: str
+        :param year: year of population
+        :type year: int
+        :returns: Dictionary of population by department.
+        :rtype: dict
+        """
+        try:
+            out = {}
+            file_path = DIR_INPUT + file + '.csv'
+            with open(file_path, newline='', encoding='utf-8-sig') as f:
+                reader = csv.DictReader(f, delimiter=delimiter)
+                for row in reader:
+                    if str(row['PARAMETER']) == parameter:
+                        out[row['AGE_GROUP']] = float(row[filter])
+            f.close()
+            return out
+        except Exception as e:
+            print('Error probabilities: {0}'.format(e))
+            return dict()
+
+    @staticmethod
+    def input_time(file: str, delimiter: str = ',', parameter: str = 'InitialSus', filter: str = 'BASE_VALUE') -> dict:
+        """Load input_time file
+        :param file: name of file.
+        :type file: str
+        :param delimiter: delimiter
+        :type delimiter: str
+        :param year: year of population
+        :type year: int
+        :returns: Dictionary of population by department.
+        :rtype: dict
+        """
+        try:
+            out = {}
+            file_path = DIR_INPUT + file + '.csv'
+            with open(file_path, newline='', encoding='utf-8-sig') as f:
+                reader = csv.DictReader(f, delimiter=delimiter)
+                for row in reader:
+                    if str(row['PARAMETER']) == parameter:
+                        out[row['AGE_GROUP']] = float(row[filter])
+            f.close()
+            return out
+        except Exception as e:
+            print('Error probabilities: {0}'.format(e))
+            return dict()
+
+    @staticmethod
+    def arrival_rate(file: str, delimiter: str = ',', filter: str = 'CALCULATED_RATE') -> dict:
+        """Load arriva rate file
+        :param file: name of file.
+        :type file: str
+        :param delimiter: delimiter
+        :type delimiter: str
+        :param year: year of population
+        :type year: int
+        :returns: Dictionary of population by department.
+        :rtype: dict
+        """
+        try:
+            out = {}
+            file_path = DIR_INPUT + file + '.csv'
+            with open(file_path, newline='', encoding='utf-8-sig') as f:
+                reader = csv.DictReader(f, delimiter=delimiter)
+                for row in reader:
+                    out[row['DEPARTMENT']] = float(str(row[filter]).replace(',', '.'))
+            f.close()
+            return out
+        except Exception as e:
+            print('Error arrival_rate: {0}'.format(e))
             return dict()
 
     @staticmethod
@@ -97,17 +268,21 @@ class Utils(object):
             file_path = DIR_INPUT + file + '.csv'
             with open(file_path, newline='', encoding='utf-8-sig') as f:
                 reader = csv.DictReader(f, delimiter=delimiter)
-                data = [row for row in reader if int(row['scenario']) == scenario]
+                data = []
+                for row in reader:
+                    value = int(row['SCENARIO'])
+                    if value == scenario:
+                        data.append(row)
             f.close()
-            out = [{'age_group': key[0], 'work_group': key[1], 'health_risk': key[2]}
-                   for key, _ in groupby(data, key=itemgetter('age_group', 'work_group', 'health_risk'))]
+            out = [{'AGE_GROUP': key[0], 'WORK_GROUP': key[1], 'HEALTH_GROUP': key[2]}
+                   for key, _ in groupby(data, key=operator.itemgetter('AGE_GROUP', 'WORK_GROUP', 'HEALTH_GROUP'))]
             return out
         except Exception as e:
-            print('Error region_capacities: {0}'.format(e))
+            print('Error priority_vaccine: {0}'.format(e))
             return list()
 
     @staticmethod
-    def contact_matrices(file: str, delimiter: str = ","):
+    def contact_matrices(file: str, delimiter: str = ",") -> dict:
         """Load Contact Matrix file
         :param file: name of file.
         :type file: str
@@ -117,18 +292,23 @@ class Utils(object):
         :rtype: List
         """
         try:
-            results = []
+            out = {}
             file_path = DIR_INPUT + file + '.csv'
             with open(file_path, 'r', newline='', encoding='utf-8-sig') as f:
-                reader = csv.reader(f, delimiter=delimiter)  # change contents to floats
-                next(reader)
+                reader = csv.DictReader(f, delimiter=delimiter)  # change contents to floats
                 for row in reader:  # each row is a list
-                    results.append(row)
+                    for k, v in dict(row).items():
+                        value = double(str(v).strip())
+                        if k not in out:
+                            out[k] = [value]
+                        else:
+                            tmp_list = list(out[k]) + [value]
+                            out[k] = tmp_list
             f.close()
-            return np.array(results, dtype=float)
+            return out
         except Exception as e:
             print('Error load_contact_matrices: {0}'.format(e))
-            return None
+            return dict()
 
     @staticmethod
     def region_capacities(file: str, delimiter: str = ",") -> dict:
@@ -179,13 +359,8 @@ class Utils(object):
             print('File JSON {0} export successfully!'.format(file_json))
 
             file_csv = DIR_OUTPUT + "{0}_{1}.csv".format(file, date_file)
-            with io.open(file_csv, 'w', newline='') as csv_output:
-                writer = csv.DictWriter(csv_output, fieldnames=['department', 'age_group', 'compartment', 'result'])
-                writer.writeheader()
-                for k, v in data.items():
-                    for kk, vv in dict(v).items():
-                        for kkk, vvv in dict(vv).items():
-                            writer.writerow({'department':k, 'age_group':kk, 'compartment':kkk,'result': vvv})
+            df = pd.DataFrame.from_dict(data).transpose()
+            df.to_csv(file_csv)
             print('File CSV {0} export successfully!'.format(file_json))
         except Exception as e:
             print('Error save: {0}'.format(e))

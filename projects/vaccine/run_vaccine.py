@@ -1,4 +1,4 @@
-from tqdm import tqdm
+import tqdm
 import datetime
 import time
 from logic.compartments import Compartments
@@ -66,7 +66,7 @@ contact_matrix = Utils.contact_matrices(file='contact_matrix', delimiter=',')
 print('Calculated Vaccination.....')
 result_vd = {}
 setting = {'contact_matrix': contact_matrix}
-for dept, age_work_health in tqdm(initial_population.items()):
+for dept, age_work_health in tqdm.tqdm(initial_population.items()):
     total_population_dept = total_population[dept]
     age_vd = dict()
     for ka, va in dict(age_work_health).items():
@@ -77,7 +77,7 @@ for dept, age_work_health in tqdm(initial_population.items()):
                 su.value = vh * (1 - sus_initial['ALL'])
                 r_a.value = vh * (1 - sus_initial['ALL'])
                 vaccine = Vaccination(_compartments=compartments, r0=0.0)
-                setting.update({'calibration': True, 'arrival_rate': arrival_rate[dept],
+                setting.update({'calibration': True, 'arrival_rate': arrival_rate[dept], 'beta': 0.5,
                                 'age_group': ka, 'work_group': kw, 'health_group': kh,
                                 'epsilon_1': 0.0, 'epsilon_2': 0.0, 't_e': t_e['ALL'], 't_a': t_a['ALL'],
                                 't_p': t_p['ALL'], 't_sy': t_sy['ALL'], 't_r': t_r['ALL'], 't_d': t_d[ka],

@@ -1,9 +1,10 @@
-import tqdm
+from tqdm import tqdm
 import datetime
 import time
 from logic.compartments import Compartments
 from logic.utils import Utils
 from projects.vaccine.vaccination import Vaccination
+#from projects.vaccine.calibration import Calibration
 
 start_processing_s = time.process_time()
 start_time = datetime.datetime.now()
@@ -42,6 +43,8 @@ v_2 = Compartments(name='Vaccination_2', value=0)
 compartments.append(v_2)
 d = Compartments(name='Dead', value=0)
 compartments.append(d)
+cases = Compartments(name='Cases', value=0)
+compartments.append(cases)
 
 print('Loading input parameters....')
 initial_population = Utils.initial_population(file='initial_population', delimiter=';')
@@ -50,10 +53,21 @@ vaccine_capacities = Utils.region_capacities(file='region_capacities')
 priority_vaccine = Utils.priority_vaccine(file='priority_vaccines', delimiter=';', scenario=1)
 arrival_rate = Utils.arrival_rate(file='arrival_rate', delimiter=';', filter='CALCULATED_RATE')
 
-sus_initial = Utils.probabilities(file='input_probabilities', delimiter=';', parameter='InitialSus', filter='BASE_VALUE')
-p_s = Utils.probabilities(file='input_probabilities', delimiter=';', parameter='ExposedToPresymp', filter='BASE_VALUE')
-p_c = Utils.probabilities(file='input_probabilities', delimiter=';', parameter='SympToHouse', filter='BASE_VALUE')
-p_h = Utils.probabilities(file='input_probabilities', delimiter=';', parameter='SympToHospital', filter='BASE_VALUE')
+sus_initial = Utils.probabilities(file='input_probabilities', delimiter=';',
+                                  parameter_1='InitialSus',  parameter_2='ALL', filter='BASE_VALUE')
+p_s = Utils.probabilities(file='input_probabilities', delimiter=';',
+                          parameter_1='ExposedToPresymp', parameter_2='ALL', filter='BASE_VALUE')
+p_c = Utils.probabilities(file='input_probabilities', delimiter=';',
+                          parameter_1='SympToHouse', parameter_2='ALL', filter='BASE_VALUE')
+p_h = Utils.probabilities(file='input_probabilities', delimiter=';',
+                          parameter_1='SympToHospital', parameter_2='ALL', filter='BASE_VALUE')
+
+p_dc = Utils.probabilities(file='input_probabilities', delimiter=';',
+                           parameter_1='HouseToDeath', filter='BASE_VALUE')
+p_dh = Utils.probabilities(file='input_probabilities', delimiter=';',
+                           parameter_1='HospitalToDeath', filter='BASE_VALUE')
+p_di = Utils.probabilities(file='input_probabilities', delimiter=';',
+                           parameter_1='ICUToDeath', filter='BASE_VALUE')
 
 t_e = Utils.input_time(file='input_time', delimiter=';', parameter='IncubationTime', filter='BASE_VALUE')
 t_a = Utils.input_time(file='input_time', delimiter=';', parameter='RecoveryTimeAsymptomatic', filter='BASE_VALUE')
@@ -65,8 +79,12 @@ t_d = Utils.input_time(file='input_time', delimiter=';', parameter='TimeToDeath'
 contact_matrix = Utils.contact_matrices(file='contact_matrix', delimiter=',')
 print('Calculated Vaccination.....')
 result_vd = {}
+result_for_cal = list()
+sim_length = 230
+for i in range(sim_length):
+    result_for_cal.append(0)
 setting = {'contact_matrix': contact_matrix}
-for dept, age_work_health in tqdm.tqdm(initial_population.items()):
+for dept, age_work_health in tqdm(initial_population.items()):
     total_population_dept = total_population[dept]
     age_vd = dict()
     for ka, va in dict(age_work_health).items():
@@ -82,11 +100,14 @@ for dept, age_work_health in tqdm.tqdm(initial_population.items()):
                                 'epsilon_1': 0.0, 'epsilon_2': 0.0, 't_e': t_e['ALL'], 't_a': t_a['ALL'],
                                 't_p': t_p['ALL'], 't_sy': t_sy['ALL'], 't_r': t_r['ALL'], 't_d': t_d[ka],
                                 'p_s': p_s[ka], 'p_c': p_c[ka], 'p_h': p_h[ka], 'p_i': (1 - (p_c[ka] + p_h[ka])),
+                                'p_dc': p_dc[ka][kh], 'p_dh': p_dh[ka][kh], 'p_di': p_di[ka][kh],
                                 'total_population': total_population_dept,
                                 'population_initial': age_work_health,
                                 'priority_vaccine': priority_vaccine,
                                 'vaccine_capacities': vaccine_capacities[dept]})
-                resp = vaccine.run(days=230, **setting)
+                resp = vaccine.run(days=sim_length, **setting)
+                for t in range(sim_length):
+                    result_for_cal[t] += resp['Cases'][t]
                 health_vd[kh] = resp
             work_vd[kw] = health_vd
         age_vd[ka] = work_vd
@@ -102,3 +123,8 @@ ss = int(execution_time % 60)
 print('Execution Time: {0} minutes {1} seconds'.format(mm, ss))
 print('Execution Time: {0} milliseconds'.format(execution_time * 1000))
 Utils.save('vaccination_dynamics', result_vd)
+
+# calibration = Calibration.run(initial_cases=40)
+print(result_for_cal)
+
+#python json_viewer.py D:\OneDrive - Universidad Tecnológica de Bolívar\AppsCAOBA\EpiIDPy\data\output\vaccination_dynamics_2020-11-12_h22m40.json

@@ -178,7 +178,8 @@ class Utils(object):
             return dict()
 
     @staticmethod
-    def probabilities(file: str, delimiter: str = ',', parameter: str = 'InitialSus', filter: str = 'BASE_VALUE') -> dict:
+    def probabilities(file: str, delimiter: str = ',', parameter_1: str = 'InitialSus',
+                      parameter_2: str = 'None', filter: str = 'BASE_VALUE') -> dict:
         """Load probabilities file
         :param file: name of file.
         :type file: str
@@ -195,8 +196,18 @@ class Utils(object):
             with open(file_path, newline='', encoding='utf-8-sig') as f:
                 reader = csv.DictReader(f, delimiter=delimiter)
                 for row in reader:
-                    if str(row['PARAMETER']) == parameter:
-                        out[row['AGE_GROUP']] = float(row[filter])
+                    key = row['AGE_GROUP']
+                    parameter = str(row['PARAMETER'])
+                    if parameter == parameter_1 and parameter_2 == 'ALL':
+                        out[key] = float(row[filter])
+                    elif parameter == parameter_1 and parameter_2 == 'None':
+                        health = row['HEALTH_GROUP']
+                        if key not in out:
+                            out[key] = {health: float(row[filter])}
+                        else:
+                            tmp_value = dict(out[key])
+                            tmp_value[health] = float(row[filter])
+                            out[key] = tmp_value
             f.close()
             return out
         except Exception as e:
@@ -357,11 +368,12 @@ class Utils(object):
                 json_output.write(str_)
             json_output.close()
             print('File JSON {0} export successfully!'.format(file_json))
-
+            '''
             file_csv = DIR_OUTPUT + "{0}_{1}.csv".format(file, date_file)
             df = pd.DataFrame.from_dict(data).transpose()
             df.to_csv(file_csv)
-            print('File CSV {0} export successfully!'.format(file_json))
+            print('File CSV {0} export successfully!'.format(file_csv))
+            '''
         except Exception as e:
             print('Error save: {0}'.format(e))
             return None

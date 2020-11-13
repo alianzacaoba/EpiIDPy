@@ -7,9 +7,9 @@ from logic.utils import Utils
 
 class Calibration(object):
 
-    def __init__(self, case_sim:dict):
-        self.case_sim = case_sim
-        print('Calibration')
+    def __init__(self, initial_cases: int = 30, total: bool = True):
+        self._initial_cases = initial_cases
+        self._total = total
 
     @staticmethod
     def __obtain_thetas__(x, y):
@@ -30,13 +30,15 @@ class Calibration(object):
             print('Error calculate_case: {0}'.format(e))
             return dict()
 
-    @staticmethod
-    def run(initial_cases:int = 30, total:bool = True) -> dict:
-        fileread = DIR_INPUT + 'real_cases.csv'
+    def run(self) -> dict:
+        initial_cases = self._initial_cases
+        total = self._total
+        file_read = DIR_INPUT + 'real_cases.csv'
         try:
-            cases_real = pd.read_csv(fileread, index_col=0, sep=';')
+            cases_real = pd.read_csv(file_read, index_col=0, sep=';')
             for c in cases_real.columns:
                 cases_real[c] = cases_real[c].apply(lambda a: int(a.replace(',', '')))
+
             case_real = np.array()
             if total:
                 case_real = cases_real['total'].as_matrix()
@@ -48,7 +50,7 @@ class Calibration(object):
             x = np.random.triangular(0, 0.5, 1, size=initial_cases)
             for i in range(initial_cases):
                 x_L.append(x[i])
-                case_sim = Calibration.__calculate_case__(x[i], case_real)  # Revisar como integrar json acá
+                case_sim = self.__calculate_case__(x[i])  # Revisar como integrar json acá
                 y_L.append(np.sum(np.power(case_sim / case_real - 1, 2)) / case_real.shape[0])
             x = np.array(x_L)
             y = np.array(y_L)

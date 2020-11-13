@@ -368,12 +368,6 @@ class Utils(object):
                 json_output.write(str_)
             json_output.close()
             print('File JSON {0} export successfully!'.format(file_json))
-            '''
-            file_csv = DIR_OUTPUT + "{0}_{1}.csv".format(file, date_file)
-            df = pd.DataFrame.from_dict(data).transpose()
-            df.to_csv(file_csv)
-            print('File CSV {0} export successfully!'.format(file_csv))
-            '''
         except Exception as e:
             print('Error save: {0}'.format(e))
             return None

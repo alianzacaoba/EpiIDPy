@@ -11,21 +11,18 @@ from logic.utils import Utils
 class ContactTracing(DiseaseModel):
     """ Class used to represent an Contact Tracing disease model """
 
-    def __init__(self, _compartments: List[Compartments], r0: float, value_b: float = 0.0, value_c: float = 0.0):
+    def __init__(self, _compartments: List[Compartments], r0: float):
         """
         Initialize the run of contact tracing disease model
         """
-        super().__init__(_compartments, r0=r0, value_b=value_b, value_c=value_c)
-        self.population = Utils.population(file='population', year=2020)
-        self.contact_matrices = Utils.contact_matrices(file='contact_matrix')
+        super().__init__(_compartments, r0=r0)
         self._num_comp = len(_compartments)
 
     def equations(self, x, t, **kwargs):
         try:
             # OA entra como paramento como un lista de ocupación por grupo etario
             dx = np.zeros(self._num_comp, dtype=double)
-            contact_matrices = kwargs.get('contact_matrices') if type(kwargs.get('contact_matrices')) is \
-                                                                 np.array(dtype=float) else np.array(0, dtype=float)
+            contact_matrix = kwargs.get('contact_matrix') if type(kwargs.get('contact_matrix')) is dict else dict()
             age_groups = kwargs.get('age_groups') if type(kwargs.get('age_groups')) is dict() else dict()
 
             beta = kwargs.get('beta') if type(kwargs.get('beta')) is float else 1.0
@@ -54,7 +51,7 @@ class ContactTracing(DiseaseModel):
             t_oa = s_toa + e_toa + a_toa + p_toa + r_toa
             n = t_oa + s_oa + e_oa + a_oa + p_oa + r_oa + ii_oa + i_oa + c_oa + h_oa
 
-            f = (beta * contact_matrices * (i_oa + a_oa + p_oa)) / n
+            f = (beta * contact_matrix * (i_oa + a_oa + p_oa)) / n
             f_g = f * (epsilon * s_toa) + s_oa
             f_toa = f_g * tt * zz * (ii_oa + i_oa)
 
@@ -83,7 +80,7 @@ class ContactTracing(DiseaseModel):
             dd_oa = {1: sigma * mi * c_oa, 2: tao * mi * hh, 3: omega * mi * uu}
 
             dr_toa = {1: ceta * a_oa, 2: f_toa * r_toa, 3: -hh * r_toa}
-            dr_oa = {1: sigma * (1 - mi) }
+            dr_oa = {1: sigma * (1 - mi)}
 
             dx[0] = sum([vs for ks, vs in ds_toa.items()])
             dx[1] = sum([vs for ks, vs in ds_oa.items()])
@@ -131,7 +128,7 @@ if __name__ == "__main__":
     compartments.append(a_oa)
     p_oa = Compartments(name="Pre-symptomatic ", value=0.0)
     compartments.append(p_oa)
-    r_oa = Compartments(name="recovered", value=0.0)
+    r_oa = Compartments(name="Recovered", value=0.0)
     compartments.append(r_oa)
     ii_oa = Compartments(name="Infectious isolate", value=0.0)
     compartments.append(ii_oa)
@@ -144,15 +141,17 @@ if __name__ == "__main__":
     u_oa = Compartments(name="Isolated-CriticalCare", value=0.0)
     compartments.append(u_oa)
 
+    population = Utils.population(file='population', year=2020)
+    contact_matrix = Utils.contact_matrices(file='contact_matrix', delimiter=',')
     ct = ContactTracing(_compartments=compartments, r0=0.0)
     result = dict()
 
     kwargs = {'fi': 0.4, 'delta': 5.0, 'epsilon': 0.0, 'mi': 0.0, 'ma': 0.0,
               'beta': 0.0, 'ceta': 0.0, 'pa': 0.0, 'g': 0.0, 'u': 0.0,
               'h': 0.0, 'pi': 0.0, 'sigma': 0.0, 't': 0.0, 'z': 0.0,
-              'tao': 0.0, 'omega': 0.0, 'contact_matrices': ct.contact_matrices}
+              'tao': 0.0, 'omega': 0.0, 'contact_matrices': contact_matrix}
 
-    for dept, age_groups in ct.population.items():
+    for dept, age_groups in population.items():
         temp = dict()
         for age, value in dict(age_groups).items():
             kwargs.update({'age_groups': value})

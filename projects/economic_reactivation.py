@@ -8,12 +8,12 @@ from logic.disease_model import DiseaseModel
 
 class EconomicReactivation(DiseaseModel):
     """Class used to represent an Economic Reactivation"""
-    def __init__(self, _compartments: List[Compartments], value_a: float, value_b: float, value_c: float):
+    def __init__(self, _compartments: List[Compartments], r0: float):
         """
         Initialize the run of the epidemic
         State and queue codes (transition event into this state)
         """
-        super().__init__(_compartments, value_a, value_b, value_c)
+        super().__init__(_compartments, r0)
         self._num_comp = len(_compartments)
 
     def equations(self, x, t, **kwargs):
@@ -145,9 +145,6 @@ if __name__ == "__main__":
     arg = {o.name: o.value for o in compartments}
 
     transitions = []
-    ct = EconomicReactivation(_compartments=compartments,
-                              value_a=rate['GAMMA'],
-                              value_b=rate['BETA'],
-                              value_c=2.3)
+    ct = EconomicReactivation(_compartments=compartments, r0=2.3)
     resp = ct.run(days=DAYS)
     print(resp)

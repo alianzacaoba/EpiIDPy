@@ -29,7 +29,7 @@ class DiseaseModel(ABC):
         """
         pass
 
-    def __solve(self, x_init: list, time_vector:list, **kwargs):
+    def __solve(self, x_init: list, time_vector: list, **kwargs):
         """Solve for dx(t) and d(t) via numerical integration, given the time path for R0.
         :param x_init: List of initial values each compartment (float list)
         :type x_init: List

@@ -1,6 +1,5 @@
 import numpy
-import pandas
-from typing import List
+from typing import List, Dict, Any, Union
 from numpy import double
 from logic.compartments import Compartments
 from logic.disease_model import DiseaseModel
@@ -59,7 +58,7 @@ class Vaccination(DiseaseModel):
             age_group = kwargs.get('age_group') if type(kwargs.get('age_group')) is str else str
             health_group = kwargs.get('health_group') if type(kwargs.get('health_group')) is str else str
             work_group = kwargs.get('work_group') if type(kwargs.get('work_group')) is str else str
-            calibration = kwargs.get('calibration') if type(kwargs.get('calibration')) is float else 0.0
+            calibration = kwargs.get('calibration') if type(kwargs.get('calibration')) is bool else False
             arrival_rate = kwargs.get('arrival_rate') if type(kwargs.get('arrival_rate')) is float else 0.0
             vaccine_capacities = kwargs.get('vaccine_capacities') if type(kwargs.get('vaccine_capacities')) is int else 1
             priority_vaccine = kwargs.get('priority_vaccine') if type(kwargs.get('priority_vaccine')) is dict else dict()
@@ -70,14 +69,14 @@ class Vaccination(DiseaseModel):
             sum_x = sum([su, f_1, f_2, e, a, a_f, r_a, v_1, v_2])
             va_sig = self.__vaccine_assignment(candidates=initial_population,
                                                vaccine_capacities=vaccine_capacities,
-                                               priority_vaccine=priority_vaccine)[0] if calibration else 0.0
+                                               priority_vaccine=priority_vaccine)[0] if not calibration else 0.0
 
             i_1 = list()
             for kg, vg in initial_population.items():
                 total = 0
                 for kw, vw in dict(vg).items():
                     for kh, vh in dict(vw).items():
-                        value = double(str(vh).strip())
+                        value = float(str(vh).strip())
                         total += value
                 i_1.append(total)
 
@@ -87,7 +86,7 @@ class Vaccination(DiseaseModel):
                 for kw, vw in dict(vg).items():
                     if kw == 'M':
                         for kh, vh in dict(vw).items():
-                            value = double(str(vh).strip())
+                            value = float(str(vh).strip())
                             total += value
                 i_2.append(total)
 
@@ -99,43 +98,74 @@ class Vaccination(DiseaseModel):
                 prod = sum(contact_i1)
             # ----------------------------------------------------------------------------------------------------------
             try:
-                ds_dt = {1: -su * va_sig,
-                         2: (-(beta * su*(1-va_sig)) / total_population) * prod}
-                f1_dt = {1: -f_1 * va_sig,
-                         2: (1 - epsilon_1) * su * va_sig,
-                         3: (-(beta * (f_1 * (1 - va_sig) + (1 - epsilon_1) * su * va_sig) / total_population) * prod)}
-                f2_dt = {1: (1 - epsilon_2) * f_1 * va_sig,
-                         2: (-(beta * (f_2 + (1 - epsilon_2) * f_1 * va_sig) / total_population) * prod)}
-                de_dt = {1: -e * va_sig,
+                contagion_sus = (beta * (su*(1-va_sig) / total_population) * prod) \
+                    if ((beta * (su*(1-va_sig) / total_population) * prod)-su*(1-va_sig))*1000 > 0.0 else 0.0
+                contagion_f1 = 0.0 # (beta * f_1 * (1 - va_sig) / total_population) * prod
+                contagion_f2 = 0.0 # ((beta * f_2  / total_population) * prod)
+                ds_dt = {1: 0.0, # -su * va_sig,
+                         2: -contagion_sus
+                         }
+                f1_dt = {1: 0.0, #-f_1 * va_sig,
+                         2: 0.0, #(1 - epsilon_1) * su * va_sig,
+                         3: -contagion_f1
+                         }
+                f2_dt = {1: 0.0, # (1 - epsilon_2) * f_1 * va_sig,
+                         2: -contagion_f2
+                         }
+                de_dt = {1: 0.0, #-e * va_sig,
                          2: (sum_x / total_population) * arrival_rate,
-                         3: -(e * (1 - va_sig) + (sum_x / total_population) * arrival_rate) / t_e,
-                         4: ((beta * su * (1 - va_sig)) / total_population) * prod}
-                def_dt = {1: -e_f / t_e,
-                          2: ((beta * (f_1 + f_2)) / total_population) * prod}
-                da_dt = {1: -a * va_sig,
+                         3: -(e * (1 - va_sig)) / t_e,
+                         4: contagion_sus
+                         }
+                def_dt = {1: 0.0, #-e_f / t_e,
+                          2: contagion_f1 + contagion_f2
+                          }
+                da_dt = {1: 0.0, #-a * va_sig,
                          2: -a * (1-va_sig) / t_a,
-                         3: (1 - p_s) * ((e * (1 - va_sig) + (sum_x / total_population) * arrival_rate) / t_e)}
-                daf_dt = {1: (1 - p_s) * e * va_sig,
-                          2: -a_f * (1 - va_sig) / t_a,
-                          3: (1 - p_s) * ((e * (1 - va_sig) + (sum_x / total_population) * arrival_rate) / t_e)}
-                dp_dt = {1: p_s * (((e * (1 - va_sig) + (sum_x / total_population) * arrival_rate) + e_f) / t_e + e * va_sig),
-                         2: -p / t_p}  # (función 1) Esto hay que guardarlo en un archivo - guardar desde el día 14 - cal_result + beta
-                dsy_dt = {1: p / t_p, 2: -sy / t_sy}
-                dc_dt = {1: -p_dc * (c / t_d), 2: -(1 - p_dc) * (c / t_r), 3: p_c * (sy / t_sy)}
-                dh_dt = {1: -p_dh * (h / t_d), 2: -(1 - p_dh) * t_r, 3: p_h * (sy / t_sy)}
-                di_dt = {1: -p_di * (i / t_d), 2: -(1 - p_di) * (i / t_r), 3: p_i * (sy / t_sy)}
-                dr_dt = {1: ((1 - p_dc) * c + (1 - p_dh) * h + (1 - p_di) * i) / t_r}
-                dra_dt = {1: -r_a * va_sig, 2: a * (1-va_sig)/t_a}
-                v1_dt = {1: -v_1 * va_sig,
-                         2: epsilon_1 * su * va_sig,
-                         3: a * va_sig,
-                         4: r_a * va_sig}
-                v2_dt = {1: v_1 * va_sig,
-                         2: epsilon_2 * f_1 * va_sig,
-                         3: a_f * (1 - va_sig) / t_a}
-                dd_dt = {1: p_c * (c / t_d),
-                         2: p_h * (h / t_d),
-                         3: p_i * (i / t_d)}
+                         3: (1 - p_s) * (e * (1 - va_sig) / t_e)
+                         }
+                daf_dt = {1: 0.0, #(1 - p_s) * e * va_sig,
+                          2: 0.0, #-a_f / t_a,
+                          3: 0.0 #(1 - p_s) * (e_f / t_e)
+                          }
+                dp_dt = {1: p_s * e * (1 - va_sig) / t_e,
+                         2: 0.0, #p_s * e_f / t_e,
+                         3: 0.0, #p_s * e * va_sig,
+                         4: -p / t_p
+                         }
+                dsy_dt = {1: p / t_p,
+                          2: -sy / t_sy
+                          }
+                dc_dt = {1: -p_dc * (c / t_d),
+                         2: -(1 - p_dc) * (c / t_r),
+                         3: p_c * (sy / t_sy)
+                         }
+                dh_dt = {1: -p_dh * (h / t_d),
+                         2: -(1 - p_dh) * h/t_r,
+                         3: p_h * (sy / t_sy)
+                         }
+                di_dt = {1: -p_di * (i / t_d),
+                         2: -(1 - p_di) * (i / t_r),
+                         3: p_i * (sy / t_sy)
+                         }
+                dr_dt = {1: ((1 - p_dc) * c + (1 - p_dh) * h + (1 - p_di) * i) / t_r
+                         }
+                dra_dt = {1: 0.0, #-r_a * va_sig,
+                          2: a * (1-va_sig)/t_a
+                          }
+                v1_dt = {1: 0.0, #-v_1 * va_sig,
+                         2: 0.0, #epsilon_1 * su * va_sig,
+                         3: 0.0, #a * va_sig,
+                         4: 0.0 #r_a * va_sig
+                         }
+                v2_dt = {1: 0.0, #v_1 * va_sig,
+                         2: 0.0, #epsilon_2 * f_1 * va_sig,
+                         3: 0.0, #a_f / t_a
+                         }
+                dd_dt = {1: p_dc * (c / t_d),
+                         2: p_dh * (h / t_d),
+                         3: p_di * (i / t_d)
+                         }
             # ----------------------------------------------------------------------------------------------------------
                 dx[0] = sum([vs for ks, vs in ds_dt.items()])       # SU
                 dx[1] = sum([vf for kf, vf in f1_dt.items()])       # F1
@@ -154,7 +184,7 @@ class Vaccination(DiseaseModel):
                 dx[14] = sum([vv for kv, vv in v1_dt.items()])      # V1
                 dx[15] = sum([vv for kv, vv in v2_dt.items()])      # V2
                 dx[16] = sum([vd for kd, vd in dd_dt.items()])      # D
-                dx[17] = dp_dt[1]
+                dx[17] = dp_dt[1] #Cases
                 return dx
             except Exception as e:
                 print('Error calculation equations elements: {0}'.format(e))

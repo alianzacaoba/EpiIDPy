@@ -87,4 +87,4 @@ ICUToDeath;e4;H;0.82;0.82;0.82
 ICUToDeath;e5;H;0.86;0.86;0.86
 ICUToDeath;e6;H;0.9;0.9;0.9
 ICUToDeath;e7;H;0.94;0.94;0.94
-InitialSus;ALL;ALL;0;0;0.2
+InitialSus;ALL;ALL;0.8;1;1

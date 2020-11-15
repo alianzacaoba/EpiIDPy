@@ -4,7 +4,6 @@ import time
 from logic.compartments import Compartments
 from logic.utils import Utils
 from projects.vaccine.vaccination import Vaccination
-from projects.vaccine.calibration import Calibration
 
 
 class ModelVaccine(object):
@@ -25,15 +24,18 @@ class ModelVaccine(object):
         p_s = kwargs.get('p_s') if type(kwargs.get('p_s')) is dict else dict()
         p_c = kwargs.get('p_c') if type(kwargs.get('p_c')) is dict else dict()
         p_h = kwargs.get('p_h') if type(kwargs.get('p_h')) is dict else dict()
-        p_i = kwargs.get('p_i') if type(kwargs.get('p_i')) is dict else dict()
         p_dc = kwargs.get('p_dc') if type(kwargs.get('p_dc')) is dict else dict()
         p_dh = kwargs.get('p_dh') if type(kwargs.get('p_dh')) is dict else dict()
         p_di = kwargs.get('p_di') if type(kwargs.get('p_di')) is dict else dict()
+        beta = kwargs.get('beta') if type(kwargs.get('beta')) is float else 0.05
+        sus_initial = kwargs.get('sus_initial') if type(kwargs.get('sus_initial')) is dict else {'ALL': 1.0}
+        calibration = kwargs.get('calibration') if type(kwargs.get('calibration')) is bool else False
         arrival_rate = kwargs.get('arrival_rate') if type(kwargs.get('arrival_rate')) is dict else dict()
         vaccine_capacities = kwargs.get('vaccine_capacities') if type(
             kwargs.get('vaccine_capacities')) is dict else dict()
         priority_vaccine = kwargs.get('priority_vaccine') if type(
             kwargs.get('priority_vaccine')) is list else list
+        sim_length = kwargs.get('sim_length')+1 if type(kwargs.get('sim_length')) is int else 237
         try:
             start_processing_s = time.process_time()
             start_time = datetime.datetime.now()
@@ -56,7 +58,7 @@ class ModelVaccine(object):
             compartments.append(p)
             sy = Compartments(name='Symptomatic ', value=0)
             compartments.append(sy)
-            c = Compartments(name='Home ', value=0)
+            c = Compartments(name='Home', value=0)
             compartments.append(c)
             h = Compartments(name='Hospitalization', value=0)
             compartments.append(h)
@@ -65,7 +67,7 @@ class ModelVaccine(object):
             r = Compartments(name='Recovered', value=0)
             compartments.append(r)
             r_a = Compartments(name='Recovered_Asymptomatic', value=0)
-            compartments.append(r)
+            compartments.append(r_a)
             v_1 = Compartments(name='Vaccination_1', value=0)
             compartments.append(v_1)
             v_2 = Compartments(name='Vaccination_2', value=0)
@@ -77,9 +79,9 @@ class ModelVaccine(object):
 
             contact_matrix = Utils.contact_matrices(file='contact_matrix', delimiter=',')
             print('Calculated Vaccination.....')
+            report = {}
             result_vd = {}
             result_for_cal = list()
-            sim_length = 230
             for i in range(sim_length):
                 result_for_cal.append(0)
             setting = {'contact_matrix': contact_matrix}
@@ -91,11 +93,11 @@ class ModelVaccine(object):
                     for kw, vw in dict(va).items():
                         health_vd = dict()
                         for kh, vh in dict(vw).items():
-                            su.value = vh * (1 - sus_initial['ALL'])
+                            su.value = vh * sus_initial['ALL']
                             r_a.value = vh * (1 - sus_initial['ALL'])
                             vaccine = Vaccination(_compartments=compartments, r0=0.0)
-                            setting.update({'calibration': True, 'arrival_rate': arrival_rate[dept], 'beta': 0.5,
-                                            'age_group': ka, 'work_group': kw, 'health_group': kh,
+                            setting.update({'calibration': calibration, 'arrival_rate': arrival_rate[dept],
+                                            'beta': beta, 'age_group': ka, 'work_group': kw, 'health_group': kh,
                                             'epsilon_1': 0.0, 'epsilon_2': 0.0, 't_e': t_e['ALL'],
                                             't_a': t_a['ALL'], 't_p': t_p['ALL'], 't_sy': t_sy['ALL'],
                                             't_r': t_r['ALL'], 't_d': t_d[ka], 'p_s': p_s[ka], 'p_c': p_c[ka],
@@ -106,14 +108,16 @@ class ModelVaccine(object):
                                             'priority_vaccine': priority_vaccine,
                                             'vaccine_capacities': vaccine_capacities[dept]})
                             resp = vaccine.run(days=sim_length, **setting)
+                            position = int(str(dept).find(" "))
+                            new_dept = str(dept)[: len(dept) if str(dept).find(" ") == -1 else (position + 1)]
+                            new_key = '{0}_{1}_{2}'.format(new_dept, kw, kh).lower()
+                            report[new_key] = resp
                             for t in range(sim_length):
                                 result_for_cal[t] += resp['Cases'][t]
                             health_vd[kh] = resp
                         work_vd[kw] = health_vd
                     age_vd[ka] = work_vd
                 result_vd[dept] = age_vd
-
-
             end_processing_s = time.process_time()
             end_processing_ns = time.process_time_ns
             end_time = datetime.datetime.now()
@@ -125,7 +129,11 @@ class ModelVaccine(object):
             print('Execution Time: {0} minutes {1} seconds'.format(mm, ss))
             print('Execution Time: {0} milliseconds'.format(execution_time * 1000))
             Utils.save('vaccination', result_vd)
-
+            Utils.export_excel(file='vaccination', data=report)
+            if calibration:
+                return {'totalCases': result_for_cal, 'results': result_vd}
+            else:
+                return {'results': result_vd}
         except Exception as e:
             print('Error vaccine_assignment: {0}'.format(e))
             return None
@@ -165,6 +173,6 @@ if __name__ == "__main__":
               'vaccine_capacities': vaccine_capacities, 'priority_vaccine': priority_vaccine,
               'arrival_rate': arrival_rate, 'sus_initial': sus_initial, 'p_s': p_s, 'p_c': p_c,
               'p_h': p_h, 'p_dc': p_dc, 'p_dh': p_dh, 'p_di': p_di, 't_e': t_e, 't_a': t_a,
-              't_p': t_p, 't_sy': t_sy, 't_r': t_r, 't_d': t_d}
+              't_p': t_p, 't_sy': t_sy, 't_r': t_r, 't_d': t_d, 'beta': 0.05, 'calibration': True}
     mv = ModelVaccine()
     mv.run(**kwargs)

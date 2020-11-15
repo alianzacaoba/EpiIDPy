@@ -4,12 +4,15 @@ import io
 import json
 import operator
 import itertools
+from tqdm import tqdm
 import numpy as np
 import pandas as pd
 from itertools import groupby
 from json import JSONEncoder
 from numpy import double
-from root import DIR_INPUT, DIR_OUTPUT
+from root import DIR_INPUT, DIR_OUTPUT, DIR_REPORT
+
+DATE_FORMAT = "%Y-%m-%d_h%Hm%M"
 
 
 class NumpyArrayEncoder(JSONEncoder):
@@ -168,7 +171,7 @@ class Utils(object):
                 for dept, rows in out.items():
                     total = 0.0
                     for row in rows:
-                        population = int(row['POPULATION'])
+                        population = float(row['POPULATION'])
                         total += population
                     result[dept] = total
             f.close()
@@ -356,7 +359,7 @@ class Utils(object):
         :rtype: JSON file
         """
         try:
-            date_file = datetime.datetime.now().strftime("%Y-%m-%d_h%Hm%M")
+            date_file = datetime.datetime.now().strftime(DATE_FORMAT)
             file_json = DIR_OUTPUT + "{0}_{1}.json".format(file, date_file)
             # Write JSON file
             with io.open(file_json, 'w', encoding='utf8') as json_output:
@@ -371,3 +374,16 @@ class Utils(object):
         except Exception as e:
             print('Error save: {0}'.format(e))
             return None
+
+    @staticmethod
+    def export_excel(file: str, data: dict):
+        # Write XLSX file
+        date_file = datetime.datetime.now().strftime(DATE_FORMAT)
+        file_xlsx = DIR_REPORT + '{0}_{1}.xlsx'.format(file, date_file)
+        print('Generating excel report....')
+        with pd.ExcelWriter(file_xlsx) as writer_xls:
+            for key, value in tqdm(data.items()):
+                df = pd.DataFrame(value)
+                df.to_excel(writer_xls, sheet_name=key)
+        writer_xls.close()
+        print('File XLSX {0} export successfully!'.format(file_xlsx))

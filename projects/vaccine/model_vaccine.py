@@ -79,7 +79,6 @@ class ModelVaccine(object):
 
             contact_matrix = Utils.contact_matrices(file='contact_matrix', delimiter=',')
             print('Calculated Vaccination.....')
-            report = {}
             result_vd = {}
             result_for_cal = list()
             for i in range(sim_length):
@@ -108,10 +107,6 @@ class ModelVaccine(object):
                                             'priority_vaccine': priority_vaccine,
                                             'vaccine_capacities': vaccine_capacities[dept]})
                             resp = vaccine.run(days=sim_length, **setting)
-                            position = int(str(dept).find(" "))
-                            new_dept = str(dept)[: len(dept) if str(dept).find(" ") == -1 else (position + 1)]
-                            new_key = '{0}_{1}_{2}'.format(new_dept, kw, kh).lower()
-                            report[new_key] = resp
                             for t in range(sim_length):
                                 result_for_cal[t] += resp['Cases'][t]
                             health_vd[kh] = resp
@@ -129,7 +124,6 @@ class ModelVaccine(object):
             print('Execution Time: {0} minutes {1} seconds'.format(mm, ss))
             print('Execution Time: {0} milliseconds'.format(execution_time * 1000))
             Utils.save('vaccination', result_vd)
-            Utils.export_excel(file='vaccination', data=report)
             if calibration:
                 return {'totalCases': result_for_cal, 'results': result_vd}
             else:

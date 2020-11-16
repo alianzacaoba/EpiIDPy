@@ -371,6 +371,7 @@ class Utils(object):
                 json_output.write(str_)
             json_output.close()
             print('File JSON {0} export successfully!'.format(file_json))
+            Utils.export_excel(file=file, data=data)
         except Exception as e:
             print('Error save: {0}'.format(e))
             return None
@@ -379,11 +380,19 @@ class Utils(object):
     def export_excel(file: str, data: dict):
         # Write XLSX file
         date_file = datetime.datetime.now().strftime(DATE_FORMAT)
-        file_xlsx = DIR_REPORT + '{0}_{1}.xlsx'.format(file, date_file)
+
         print('Generating excel report....')
-        with pd.ExcelWriter(file_xlsx) as writer_xls:
-            for key, value in tqdm(data.items()):
-                df = pd.DataFrame(value)
-                df.to_excel(writer_xls, sheet_name=key)
-        writer_xls.close()
-        print('File XLSX {0} export successfully!'.format(file_xlsx))
+        result = {}
+        for dept, age_work_health in tqdm(data.items()):
+            position = int(str(dept).find(" "))
+            dept = str(dept)[: len(dept) if str(dept).find(" ") == -1 else (position + 1)].lower()
+            file_xlsx = DIR_REPORT + '{0}_{1}_{2}.xlsx'.format(file, dept, date_file)
+            with pd.ExcelWriter(file_xlsx) as writer_xls:
+                for ka, va in dict(age_work_health).items():
+                    for kw, vw in dict(va).items():
+                        for kh, vh in dict(vw).items():
+                            sheet_name = '{0}_{1}_{2}'.format(ka, kw, kh)
+                            df = pd.DataFrame(vh)
+                            df.to_excel(writer_xls, sheet_name=sheet_name)
+            writer_xls.close()
+        print('Files XLSX {0} export successfully!')

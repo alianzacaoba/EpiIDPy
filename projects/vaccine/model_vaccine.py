@@ -1,6 +1,7 @@
-from tqdm import tqdm
 import datetime
 import time
+import numpy as np
+from tqdm import tqdm
 from logic.compartments import Compartments
 from logic.utils import Utils
 from projects.vaccine.vaccination import Vaccination
@@ -15,6 +16,7 @@ class ModelVaccine(object):
         initial_population = kwargs.get('initial_population') if type(
             kwargs.get('initial_population')) is dict else dict()
         total_population = kwargs.get('total_population') if type(kwargs.get('total_population')) is dict else dict()
+        tp_ege_group = kwargs.get('tp_ege_group') if type(kwargs.get('tp_ege_group')) is list else list()
         t_e = kwargs.get('t_e') if type(kwargs.get('t_e')) is dict else dict()
         t_a = kwargs.get('t_a') if type(kwargs.get('t_a')) is dict else dict()
         t_p = kwargs.get('t_p') if type(kwargs.get('t_p')) is dict else dict()
@@ -84,35 +86,38 @@ class ModelVaccine(object):
             for i in range(sim_length):
                 result_for_cal.append(0)
             setting = {'contact_matrix': contact_matrix}
-            for dept, age_work_health in tqdm(initial_population.items()):
+            for dept, work_health in tqdm(initial_population.items()):
                 total_population_dept = total_population[dept]
-                age_vd = dict()
-                for ka, va in dict(age_work_health).items():
-                    work_vd = dict()
-                    for kw, vw in dict(va).items():
-                        health_vd = dict()
-                        for kh, vh in dict(vw).items():
-                            su.value = vh * sus_initial['ALL']
-                            r_a.value = vh * (1 - sus_initial['ALL'])
-                            vaccine = Vaccination(_compartments=compartments, r0=0.0)
-                            setting.update({'calibration': calibration, 'arrival_rate': arrival_rate[dept],
-                                            'beta': beta, 'age_group': ka, 'work_group': kw, 'health_group': kh,
-                                            'epsilon_1': 0.0, 'epsilon_2': 0.0, 't_e': t_e['ALL'],
-                                            't_a': t_a['ALL'], 't_p': t_p['ALL'], 't_sy': t_sy['ALL'],
-                                            't_r': t_r['ALL'], 't_d': t_d[ka], 'p_s': p_s[ka], 'p_c': p_c[ka],
-                                            'p_h': p_h[ka], 'p_i': (1 - (p_c[ka] + p_h[ka])),
-                                            'p_dc': p_dc[ka][kh], 'p_dh': p_dh[ka][kh], 'p_di': p_di[ka][kh],
+                inf_percent = {'e0': dict(), 'e1': dict(), 'e2': dict(), 'e3': dict(),
+                               'e4': dict(), 'e5': dict(), 'e6': dict(), 'e7': dict()}
+                work_vd = dict()
+                for kw, vw in dict(work_health).items():
+                    health_vd = dict()
+                    for kh, vh in dict(vw).items():
+                        age_group = dict(vh)
+                        age_vd = dict()
+                        vaccine = Vaccination(_compartments=compartments, r0=0.0, inf_percent=inf_percent)
+                        for ka, va in age_group.items():
+                            su.value = va * sus_initial['ALL']
+                            r_a.value = va * (1 - sus_initial['ALL'])
+                            setting.update({'calibration': calibration, 'arrival_rate': arrival_rate[dept], 'beta': beta,
+                                            'work': kw, 'health': kh, 'age': ka, 'epsilon_1': 0.0, 'epsilon_2': 0.0,
+                                            't_e': t_e['ALL'], 't_a': t_a['ALL'], 't_p': t_p['ALL'], 't_sy': t_sy['ALL'],
+                                            't_r': t_r['ALL'], 't_d': t_d, 'p_s': p_s['ALL'], 'p_c': p_c['ALL'],
+                                            'p_h': p_h['ALL'], 'p_i': (1 - (p_c['ALL'] + p_h['ALL'])),
+                                            'p_dc': p_dc[kh], 'p_dh': p_dh[kh], 'p_di': p_di[kh],
                                             'total_population': total_population_dept,
-                                            'initial_population': age_work_health,
+                                            'initial_population': age_group,
                                             'priority_vaccine': priority_vaccine,
                                             'vaccine_capacities': vaccine_capacities[dept]})
                             resp = vaccine.run(days=sim_length, **setting)
+                            # print(vaccine.inf_percent)
                             for t in range(sim_length):
                                 result_for_cal[t] += resp['Cases'][t]
-                            health_vd[kh] = resp
-                        work_vd[kw] = health_vd
-                    age_vd[ka] = work_vd
-                result_vd[dept] = age_vd
+                            age_vd[ka] = resp
+                        health_vd[kh] = age_vd
+                    work_vd[kw] = health_vd
+                result_vd[dept] = work_vd
             end_processing_s = time.process_time()
             end_processing_ns = time.process_time_ns
             end_time = datetime.datetime.now()

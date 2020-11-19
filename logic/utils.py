@@ -4,6 +4,8 @@ import io
 import json
 import operator
 import itertools
+import os
+
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
@@ -103,40 +105,39 @@ class Utils(object):
         try:
             result = {}
             file_path = DIR_INPUT + file + '.csv'
+            work_health_age_dict = {}
             with open(file_path, newline='', encoding='utf-8-sig') as f:
                 reader = csv.DictReader(f, delimiter=delimiter)
                 data = [i for i in reader]
-                d = sorted(data, key=operator.itemgetter('DEPARTMENT', 'AGE_GROUP', 'WORK_GROUP', 'HEALTH_GROUP'))
-                out = {}
+                d = sorted(data, key=operator.itemgetter('DEPARTMENT', 'WORK_GROUP', 'HEALTH_GROUP', 'AGE_GROUP'))
                 for key, v in groupby(d, key=operator.itemgetter('DEPARTMENT')):
-                    if key not in out:
-                        out[key] = list(v)
+                    if key not in work_health_age_dict:
+                        work_health_age_dict[key] = list(v)
                     else:
-                        tmp = list(out[key])
-                        out[key] = tmp.extend(v)
-
-                for dept, rows in out.items():
-                    age_dict = {}
-                    for row in rows:
-                        age_group = str(row['AGE_GROUP'])
-                        work_group = str(row['WORK_GROUP'])
-                        health_group = str(row['HEALTH_GROUP'])
-                        population = int(row['POPULATION'])
-                        if age_group not in age_dict:
-                            age_dict[age_group] = {work_group: {health_group: population}}
-                        else:
-                            value_work = dict(age_dict[age_group])
-                            if work_group not in value_work:
-                                value_work[work_group] = {health_group: population}
-                            else:
-                                value_heath = value_work[work_group]
-                                if health_group not in value_heath:
-                                    value_heath[health_group] = population
-                                value_work[work_group] = value_heath
-                            age_dict[age_group] = value_work
-                    result[dept] = age_dict
-                # print(result)
+                        tmp = list(work_health_age_dict[key])
+                        work_health_age_dict[key] = tmp.extend(v)
             f.close()
+            for dept, rows in work_health_age_dict.items():
+                work_health_dict = {}
+                for row in rows:
+                    age_group = str(row['AGE_GROUP'])
+                    work_group = str(row['WORK_GROUP'])
+                    health_group = str(row['HEALTH_GROUP'])
+                    population = int(row['POPULATION'])
+                    if work_group not in work_health_dict:
+                        work_health_dict[work_group] = {health_group: {age_group: population}}
+                    else:
+                        value_work = dict(work_health_dict[work_group])
+                        if health_group not in value_work:
+                            value_work[health_group] = {age_group: population}
+                        else:
+                            value_health = dict(value_work[health_group])
+                            if age_group not in value_health:
+                                value_health[age_group] = population
+
+                            value_work[health_group] = value_health
+                        work_health_dict[work_group] = value_work
+                    result[dept] = work_health_dict
             return result
         except Exception as e:
             print('Error initial_population: {0}'.format(e))
@@ -155,26 +156,31 @@ class Utils(object):
         :rtype: dict
         """
         try:
-            result = {}
             file_path = DIR_INPUT + file + '.csv'
+            work_health_age_dict = {}
             with open(file_path, newline='', encoding='utf-8-sig') as f:
                 reader = csv.DictReader(f, delimiter=delimiter)
                 data = [i for i in reader]
-                d = sorted(data, key=operator.itemgetter('DEPARTMENT', 'AGE_GROUP', 'WORK_GROUP', 'HEALTH_GROUP'))
-                out = {}
+                d = sorted(data, key=operator.itemgetter('DEPARTMENT', 'WORK_GROUP', 'HEALTH_GROUP', 'AGE_GROUP'))
                 for key, v in groupby(d, key=operator.itemgetter('DEPARTMENT')):
-                    if key not in out:
-                        out[key] = list(v)
+                    if key not in work_health_age_dict:
+                        work_health_age_dict[key] = list(v)
                     else:
-                        tmp = list(out[key])
-                        out[key] = tmp.extend(v)
-                for dept, rows in out.items():
-                    total = 0.0
-                    for row in rows:
-                        population = float(row['POPULATION'])
-                        total += population
-                    result[dept] = total
+                        tmp = list(work_health_age_dict[key])
+                        work_health_age_dict[key] = tmp.extend(v)
             f.close()
+            result = {}
+            for dept, rows in work_health_age_dict.items():
+                tmp_dict = {}
+                for row in rows:
+                    age_group = str(row['AGE_GROUP'])
+                    population = int(row['POPULATION'])
+                    if age_group not in tmp_dict:
+                        tmp_dict[age_group] = population
+                    else:
+                        value = tmp_dict[age_group]
+                        tmp_dict[age_group] = value + population
+                result[dept] = tmp_dict
             return result
         except Exception as e:
             print('Error initial_population: {0}'.format(e))
@@ -199,18 +205,20 @@ class Utils(object):
             with open(file_path, newline='', encoding='utf-8-sig') as f:
                 reader = csv.DictReader(f, delimiter=delimiter)
                 for row in reader:
-                    key = row['AGE_GROUP']
                     parameter = str(row['PARAMETER'])
                     if parameter == parameter_1 and parameter_2 == 'ALL':
-                        out[key] = float(row[filter])
+                        out[parameter_2] = float(row[filter])
+                        break
                     elif parameter == parameter_1 and parameter_2 == 'None':
                         health = row['HEALTH_GROUP']
-                        if key not in out:
-                            out[key] = {health: float(row[filter])}
+                        age_group = row['AGE_GROUP']
+                        if health not in out:
+                            out[health] = {age_group: float(row[filter])}
                         else:
-                            tmp_value = dict(out[key])
-                            tmp_value[health] = float(row[filter])
-                            out[key] = tmp_value
+                            tmp_value = dict(out[health])
+                            if age_group not in tmp_value:
+                                tmp_value[age_group] = float(row[filter])
+                            out[health] = tmp_value
             f.close()
             return out
         except Exception as e:
@@ -371,7 +379,7 @@ class Utils(object):
                 json_output.write(str_)
             json_output.close()
             print('File JSON {0} export successfully!'.format(file_json))
-            Utils.export_excel(file=file, data=data)
+            # Utils.export_excel(file=file, data=data)
         except Exception as e:
             print('Error save: {0}'.format(e))
             return None
@@ -379,10 +387,10 @@ class Utils(object):
     @staticmethod
     def export_excel(file: str, data: dict):
         # Write XLSX file
+        if not os.path.exists(DIR_REPORT):
+            os.makedirs(DIR_REPORT)
         date_file = datetime.datetime.now().strftime(DATE_FORMAT)
-
         print('Generating excel report....')
-        result = {}
         for dept, age_work_health in tqdm(data.items()):
             position = int(str(dept).find(" "))
             dept = str(dept)[: len(dept) if str(dept).find(" ") == -1 else (position + 1)].lower()

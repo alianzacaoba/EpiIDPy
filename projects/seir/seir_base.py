@@ -49,7 +49,7 @@ class SEIR(DiseaseModel):
 if __name__ == "__main__":
     start_processing_s = time.process_time()
     start_time = datetime.datetime.now()
-    susc = Compartments(name="susceptible", value=999999)
+    susc = Compartments(name="susceptible", value=999999.0)
     expo = Compartments(name="exposed", value=0)
     inf = Compartments(name="infectious", value=1)
     rec = Compartments(name="recovered", value=0)

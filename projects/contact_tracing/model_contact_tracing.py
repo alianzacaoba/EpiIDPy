@@ -3,12 +3,13 @@ import time
 import numpy as np
 from typing import List
 from numpy import double
+from tqdm import tqdm
 from logic.compartments import Compartments
 from logic.disease_model import DiseaseModel
 from logic.utils import Utils
 
 
-class ContactTracing(DiseaseModel):
+class ModelContactTracing(DiseaseModel):
     """ Class used to represent an Contact Tracing disease model """
 
     def __init__(self, _compartments: List[Compartments], r0: float):
@@ -23,7 +24,8 @@ class ContactTracing(DiseaseModel):
             # OA entra como paramento como un lista de ocupación por grupo etario
             dx = np.zeros(self._num_comp, dtype=double)
             contact_matrix = kwargs.get('contact_matrix') if type(kwargs.get('contact_matrix')) is dict else dict()
-            age_groups = kwargs.get('age_groups') if type(kwargs.get('age_groups')) is dict() else dict()
+            total_population = kwargs.get('total_population') if type(kwargs.get('total_population')) is dict else dict()
+            age = kwargs.get('age') if type(kwargs.get('age')) is str else str
 
             beta = kwargs.get('beta') if type(kwargs.get('beta')) is float else 1.0
             epsilon = kwargs.get('epsilon') if type(kwargs.get('epsilon')) is float else 1.0
@@ -43,15 +45,17 @@ class ContactTracing(DiseaseModel):
             tao = kwargs.get('tao') if type(kwargs.get('tao')) is float else 1.0
             omega = kwargs.get('omega') if type(kwargs.get('omega')) is float else 1.0
 
-            s_toa, e_toa, p_toa, i_toa, a_toa, r_toa = x
-            s_oa, e_oa, p_oa, ii_oa, i_oa, a_oa, r_oa, c_oa, h_oa, u_oa = x
+            s_toa, e_toa, p_toa, a_toa, r_toa, s_oa, e_oa, p_oa, a_oa, ii_oa, i_oa, c_oa, h_oa, u_oa, d, r_oa = x
 
             i = 1.0  # es un compartimento o un valor?
             i_i = 1.0  # es un compartimento o un valor?
             t_oa = s_toa + e_toa + a_toa + p_toa + r_toa
             n = t_oa + s_oa + e_oa + a_oa + p_oa + r_oa + ii_oa + i_oa + c_oa + h_oa
 
-            f = (beta * contact_matrix * (i_oa + a_oa + p_oa)) / n
+            prod_matrix = [a * b for a, b in zip(contact_matrix[age], total_population.values())]
+            prod_matrix = sum(prod_matrix)
+
+            f = (beta * prod_matrix * (i_oa + a_oa + p_oa)) / n if n > 0.0 else 0.0
             f_g = f * (epsilon * s_toa) + s_oa
             f_toa = f_g * tt * zz * (ii_oa + i_oa)
 
@@ -108,15 +112,22 @@ class ContactTracing(DiseaseModel):
 if __name__ == "__main__":
     start_processing_s = time.process_time()
     start_time = datetime.datetime.now()
+    ut = Utils()
+    initial_population = ut.initial_population_ct(file='initial_population', delimiter=';')
+    total_population = ut.total_population(file='initial_population', delimiter=';')
+    sus_initial = ut.probabilities(file='input_probabilities', delimiter=';',
+                                   parameter_1='InitialSus', parameter_2='ALL', filter='BASE_VALUE')
+    contact_matrix = Utils.contact_matrices(file='contact_matrix', delimiter=',')
+
     compartments = []
     s_toa = Compartments(name="Susceptible traced", value=0.0)
     compartments.append(s_toa)
     e_toa = Compartments(name="Exposed traced", value=0.0)
     compartments.append(e_toa)
-    a_toa = Compartments(name="Asymptomatic traced", value=0.0)
-    compartments.append(a_toa)
     p_toa = Compartments(name="Pre-symptomatic traced", value=0.0)
     compartments.append(p_toa)
+    a_toa = Compartments(name="Asymptomatic traced", value=0.0)
+    compartments.append(a_toa)
     r_toa = Compartments(name="recovered traced", value=0.0)
     compartments.append(r_toa)
 
@@ -124,12 +135,10 @@ if __name__ == "__main__":
     compartments.append(s_oa)
     e_oa = Compartments(name="Exposed", value=0.0)
     compartments.append(e_oa)
-    a_oa = Compartments(name="Asymptomatic", value=0.0)
-    compartments.append(a_oa)
     p_oa = Compartments(name="Pre-symptomatic ", value=0.0)
     compartments.append(p_oa)
-    r_oa = Compartments(name="Recovered", value=0.0)
-    compartments.append(r_oa)
+    a_oa = Compartments(name="Asymptomatic", value=0.0)
+    compartments.append(a_oa)
     ii_oa = Compartments(name="Infectious isolate", value=0.0)
     compartments.append(ii_oa)
     i_oa = Compartments(name="Infectious", value=0.0)
@@ -140,25 +149,33 @@ if __name__ == "__main__":
     compartments.append(h_oa)
     u_oa = Compartments(name="Isolated-CriticalCare", value=0.0)
     compartments.append(u_oa)
-
-    population = Utils.population(file='population', year=2020)
-    contact_matrix = Utils.contact_matrices(file='contact_matrix', delimiter=',')
-    ct = ContactTracing(_compartments=compartments, r0=0.0)
-    result = dict()
+    d = Compartments(name="Dead", value=0.0)
+    compartments.append(d)
+    r_oa = Compartments(name="Recovered", value=0.0)
+    compartments.append(r_oa)
 
     kwargs = {'fi': 0.4, 'delta': 5.0, 'epsilon': 0.0, 'mi': 0.0, 'ma': 0.0,
-              'beta': 0.0, 'ceta': 0.0, 'pa': 0.0, 'g': 0.0, 'u': 0.0,
-              'h': 0.0, 'pi': 0.0, 'sigma': 0.0, 't': 0.0, 'z': 0.0,
-              'tao': 0.0, 'omega': 0.0, 'contact_matrices': contact_matrix}
+              'beta': 0.5, 'ceta': 0.0, 'pa': 0.0, 'g': 0.0, 'u': 0.0,
+              'h': 0.0, 'pi': 0.0, 'sigma': 0.0, 'tt': 0.0, 'z': 0.0,
+              'tao': 0.0, 'omega': 0.0, 'contact_matrix': contact_matrix}
 
-    for dept, age_groups in population.items():
-        temp = dict()
-        for age, value in dict(age_groups).items():
-            kwargs.update({'age_groups': value})
-            resp = ct.run(days=100, **kwargs)
-            temp[age] = resp
-        result[dept] = temp
-
+    result = dict()
+    for dept, work_group in tqdm(initial_population.items()):
+        total_population_dept = total_population[dept]
+        work_group_ct = dict()
+        ct = ModelContactTracing(_compartments=compartments, r0=0.0)
+        kwargs.update({'total_population': total_population_dept})
+        work_ct = dict()
+        for kw, vv in dict(work_group).items():
+            age_ct = dict()
+            for ka, va in dict(vv).items():
+                s_toa.value = va * sus_initial['ALL']
+                r_toa.value = va * (1 - sus_initial['ALL'])
+                kwargs.update({'age': ka})
+                resp = ct.run(days=100, **kwargs)
+                age_ct[ka] = resp
+            work_ct[kw] = age_ct
+        result[dept] =work_ct
     end_processing_s = time.process_time()
     end_processing_ns = time.process_time_ns
     end_time = datetime.datetime.now()
@@ -166,3 +183,5 @@ if __name__ == "__main__":
     time_diff = (end_time - start_time)
     execution_time = time_diff.total_seconds() * 1000
     print('Execution Time: {0} milliseconds'.format(execution_time))
+    Utils.save('contact_tracing', result)
+    Utils.export_excel_ct('contact_tracing', result)

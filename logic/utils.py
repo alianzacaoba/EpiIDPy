@@ -144,6 +144,56 @@ class Utils(object):
             return dict()
 
     @staticmethod
+    def initial_population_ct(file: str, delimiter: str = ',') -> dict:
+        """Load Population file
+        :param file: name of file.
+        :type file: str
+        :param delimiter: delimiter
+        :type delimiter: str
+        :param year: year of population
+        :type year: int
+        :returns: Dictionary of population by department.
+        :rtype: dict
+        """
+        try:
+            result = {}
+            file_path = DIR_INPUT + file + '.csv'
+            work_health_age_dict = {}
+            with open(file_path, newline='', encoding='utf-8-sig') as f:
+                reader = csv.DictReader(f, delimiter=delimiter)
+                data = [i for i in reader]
+                d = sorted(data, key=operator.itemgetter('DEPARTMENT', 'WORK_GROUP', 'HEALTH_GROUP', 'AGE_GROUP'))
+                for key, v in groupby(d, key=operator.itemgetter('DEPARTMENT')):
+                    if key not in work_health_age_dict:
+                        work_health_age_dict[key] = list(v)
+                    else:
+                        tmp = list(work_health_age_dict[key])
+                        work_health_age_dict[key] = tmp.extend(v)
+            f.close()
+            for dept, rows in work_health_age_dict.items():
+                work_dict = {}
+                for row in rows:
+                    age = str(row['AGE_GROUP'])
+                    work = str(row['WORK_GROUP'])
+                    population = int(row['POPULATION'])
+                    if work not in work_dict:
+                        work_dict[work] = {age: population}
+                    else:
+                        age_dict = dict(work_dict[work])
+                        if age not in age_dict:
+                            age_dict[age] = population
+                        else:
+                            value_age = age_dict[age]
+                            age_dict[age] = value_age + population
+
+                        work_dict[work] = age_dict
+                result[dept] = work_dict
+            return result
+        except Exception as e:
+            print('Error initial_population: {0}'.format(e))
+            return dict()
+
+    @staticmethod
     def total_population(file: str, delimiter: str = ',') -> dict:
         """Load Population file
         :param file: name of file.
@@ -379,28 +429,26 @@ class Utils(object):
                 json_output.write(str_)
             json_output.close()
             print('File JSON {0} export successfully!'.format(file_json))
-            # Utils.export_excel(file=file, data=data)
         except Exception as e:
             print('Error save: {0}'.format(e))
             return None
 
     @staticmethod
-    def export_excel(file: str, data: dict):
+    def export_excel_ct(file: str, data: dict):
         # Write XLSX file
         if not os.path.exists(DIR_REPORT):
             os.makedirs(DIR_REPORT)
         date_file = datetime.datetime.now().strftime(DATE_FORMAT)
         print('Generating excel report....')
-        for dept, age_work_health in tqdm(data.items()):
+        for dept, work_age in tqdm(data.items()):
             position = int(str(dept).find(" "))
             dept = str(dept)[: len(dept) if str(dept).find(" ") == -1 else (position + 1)].lower()
             file_xlsx = DIR_REPORT + '{0}_{1}_{2}.xlsx'.format(file, dept, date_file)
             with pd.ExcelWriter(file_xlsx) as writer_xls:
-                for ka, va in dict(age_work_health).items():
-                    for kw, vw in dict(va).items():
-                        for kh, vh in dict(vw).items():
-                            sheet_name = '{0}_{1}_{2}'.format(ka, kw, kh)
-                            df = pd.DataFrame(vh)
-                            df.to_excel(writer_xls, sheet_name=sheet_name)
+                for kw, vw in dict(work_age).items():
+                    for age, value in dict(vw).items():
+                        sheet_name = '{0}_{1}'.format(age, kw)
+                        df = pd.DataFrame(value)
+                        df.to_excel(writer_xls, sheet_name=sheet_name)
             writer_xls.close()
         print('Files XLSX {0} export successfully!')

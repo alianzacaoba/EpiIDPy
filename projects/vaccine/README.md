@@ -1,5 +1,7 @@
 Modelo compartimental para la evaluación de la vacuna covid-19
 ==============================================================
+![](/media/vaccine/vaccine_model.png)
+
 
 # Quick Links
 

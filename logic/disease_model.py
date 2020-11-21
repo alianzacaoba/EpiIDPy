@@ -1,6 +1,6 @@
 from abc import ABC
 from typing import List
-from pandas import np
+import numpy
 from scipy.integrate import odeint
 from logic.compartments import Compartments
 
@@ -8,7 +8,7 @@ from logic.compartments import Compartments
 class DiseaseModel(ABC):
     """ Class used to represent an Disease Model"""
 
-    def __init__(self, compartments: List[Compartments], r0: float = 0.0, value_b: float = 0.0, value_c: float = 0.0):
+    def __init__(self, compartments: List[Compartments], r0: float = 0.0):
         """ Init Disease Model with parameters.
         :param compartments: name of compartment.
         :type compartments: List
@@ -17,8 +17,6 @@ class DiseaseModel(ABC):
         """
         self._compartments = compartments
         self._r0 = r0
-        self.value_b = value_b
-        self.value_c = value_c
 
     def equations(self, x, t, **kwargs):
         """Time derivative of the state vector.
@@ -31,7 +29,7 @@ class DiseaseModel(ABC):
         """
         pass
 
-    def __solve(self, x_init: list, time_vector, **kwargs):
+    def __solve(self, x_init: list, time_vector: list, **kwargs):
         """Solve for dx(t) and d(t) via numerical integration, given the time path for R0.
         :param x_init: List of initial values each compartment (float list)
         :type x_init: List
@@ -43,7 +41,7 @@ class DiseaseModel(ABC):
         try:
             # http://www.scholarpedia.org/article/Odeint_library
             result = odeint(lambda x, t: self.equations(x, t, **kwargs), x_init, time_vector)
-            result = np.transpose(result)
+            result = numpy.transpose(result)
             for k, _ in enumerate(result):
                 self._compartments[k].result = result[k]
                 self._compartments[k].value = x_init[k]
@@ -63,7 +61,7 @@ class DiseaseModel(ABC):
         """
         try:
             compartments_values = [c.value for c in self._compartments]
-            time_vector = np.linspace(start=0, stop=days, num=days)
+            time_vector = list(numpy.linspace(start=0, stop=days, num=days, dtype=int))
             resp = self.__solve(x_init=compartments_values, time_vector=time_vector, **kwargs)
             return resp
         except Exception as e:

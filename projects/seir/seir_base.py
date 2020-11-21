@@ -1,9 +1,6 @@
 import datetime
 import time
-
 import pandas as pd
-from timeit import default_timer as timer
-from datetime import timedelta
 import numpy as np
 from typing import List
 from numpy import double
@@ -52,7 +49,7 @@ class SEIR(DiseaseModel):
 if __name__ == "__main__":
     start_processing_s = time.process_time()
     start_time = datetime.datetime.now()
-    susc = Compartments(name="susceptible", value=999999)
+    susc = Compartments(name="susceptible", value=999999.0)
     expo = Compartments(name="exposed", value=0)
     inf = Compartments(name="infectious", value=1)
     rec = Compartments(name="recovered", value=0)

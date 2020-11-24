@@ -45,12 +45,12 @@ class ModelContactTracing(DiseaseModel):
             tao = kwargs.get('tao') if type(kwargs.get('tao')) is float else 1.0
             omega = kwargs.get('omega') if type(kwargs.get('omega')) is float else 1.0
 
-            s_toa, e_toa, p_toa, a_toa, r_toa, s_oa, e_oa, p_oa, a_oa, ii_oa, i_oa, c_oa, h_oa, u_oa, d, r_oa = x
+            s_toa, e_toa, p_toa, a_toa, r_toa, s_oa, e_oa, p_oa, a_oa, ii_oa, i_oa, c_oa, h, u, d, r_oa = x
 
             i = 1.0  # es un compartimento o un valor?
             i_i = 1.0  # es un compartimento o un valor?
             t_oa = s_toa + e_toa + a_toa + p_toa + r_toa
-            n = t_oa + s_oa + e_oa + a_oa + p_oa + r_oa + ii_oa + i_oa + c_oa + h_oa
+            n = t_oa + s_oa + e_oa + a_oa + p_oa + r_oa + ii_oa + i_oa + c_oa + h
 
             prod_matrix = [a * b for a, b in zip(contact_matrix[age], total_population.values())]
             prod_matrix = sum(prod_matrix)
@@ -63,7 +63,7 @@ class ModelContactTracing(DiseaseModel):
             ds_oa = {1: fi * s_oa, 2: -f * s_oa, 3: -mi * s_oa, 4: hh * s_oa}
 
             de_toa = {1: f * s_toa, 2: -alfa * e_oa, 3: -mi * e_toa, 4: f_toa * e_toa, 5: -hh * e_toa}
-            de_oa = {1: f * s_oa, 2: -alfa * s_oa, 3: -mi * e_oa, 4: -h_oa * e_oa, 5: -hh * e_toa}
+            de_oa = {1: f * s_oa, 2: -alfa * s_oa, 3: -mi * e_oa, 4: -h * e_oa, 5: -hh * e_toa}
 
             da_toa = {1: alfa * (1 - gg) * e_oa, 2: -ceta * a_toa, 3: -mi * a_toa,
                       4: ma * a_toa, 5: f_toa * a_toa, 6: -hh * a_toa}
@@ -78,9 +78,9 @@ class ModelContactTracing(DiseaseModel):
             di_oa = {1: alfa * p_oa, 2: -pi * i, 3: f_g * tt * zz * i_oa}
 
             dc_oa = {1: 2 * pi * (1 - (uu + hh)) * (i_i + i), 2: sigma * c_oa}
-            dh_oa = {1: 2 * pi * hh * (i_i + i), 2: -tao * h_oa}
+            dh_oa = {1: 2 * pi * hh * (i_i + i), 2: -tao * h}
 
-            du_oa = {1: 2 * pi * uu * (i_i + i), 2: -omega * u_oa}
+            du_oa = {1: 2 * pi * uu * (i_i + i), 2: -omega * u}
             dd_oa = {1: sigma * mi * c_oa, 2: tao * mi * hh, 3: omega * mi * uu}
 
             dr_toa = {1: ceta * a_oa, 2: f_toa * r_toa, 3: -hh * r_toa}
@@ -135,7 +135,7 @@ if __name__ == "__main__":
     compartments.append(s_oa)
     e_oa = Compartments(name="Exposed", value=0.0)
     compartments.append(e_oa)
-    p_oa = Compartments(name="Pre-symptomatic ", value=0.0)
+    p_oa = Compartments(name="Pre-symptomatic", value=0.0)
     compartments.append(p_oa)
     a_oa = Compartments(name="Asymptomatic", value=0.0)
     compartments.append(a_oa)
@@ -143,12 +143,12 @@ if __name__ == "__main__":
     compartments.append(ii_oa)
     i_oa = Compartments(name="Infectious", value=0.0)
     compartments.append(i_oa)
-    c_oa = Compartments(name="Inhomecare-Isolated ", value=0.0)
+    c_oa = Compartments(name="Inhomecare-Isolated", value=0.0)
     compartments.append(c_oa)
-    h_oa = Compartments(name="Isolated Hospitalization", value=0.0)
-    compartments.append(h_oa)
-    u_oa = Compartments(name="Isolated-CriticalCare", value=0.0)
-    compartments.append(u_oa)
+    h = Compartments(name="Isolated Hospitalization", value=0.0)
+    compartments.append(h)
+    u = Compartments(name="Isolated-CriticalCare", value=0.0)
+    compartments.append(u)
     d = Compartments(name="Dead", value=0.0)
     compartments.append(d)
     r_oa = Compartments(name="Recovered", value=0.0)
@@ -175,7 +175,7 @@ if __name__ == "__main__":
                 resp = ct.run(days=100, **kwargs)
                 age_ct[ka] = resp
             work_ct[kw] = age_ct
-        result[dept] =work_ct
+        result[dept] = work_ct
     end_processing_s = time.process_time()
     end_processing_ns = time.process_time_ns
     end_time = datetime.datetime.now()

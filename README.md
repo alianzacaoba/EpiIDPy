@@ -44,6 +44,8 @@ the equation function with an example of a SIR model with four compartments.
 <br />The result function returns a dictionary of compartments with the respective matrices, after executing the process 
 described above.
 
+You can obtain more information about the classes and functions of the Framework, at the following address. <https://alianzacaoba.github.io/EpiIDPy/#>
+
 ## Installation
 
 EpilDPy requires Python 3.6.1 or later. The preferred way to install **EpilDPy** is via `pip`.  Just run `pip install EpilDPy` in your Python environment and you're good to go!
@@ -70,6 +72,6 @@ Minciencias | Ministerio de Ciencia Tecnología e Innovación
 
 ## Projects
 
-- SEIR ![](./projects/seir/README.md)
-- Covid Economic Evaluation <https://alianzacaoba.github.io/EpiIDPy/#>
-- Contact Tracing ![](./projects/contact_tracing/README.md)
+- [SEIR](https://github.com/alianzacaoba/EpiIDPy/blob/master/projects/seir)
+- [Covid Economic Evaluation](https://github.com/alianzacaoba/CovidEconomicEvaluation)
+- [Contact Tracing](https://github.com/alianzacaoba/EpiIDPy/tree/master/projects/contact_tracing)

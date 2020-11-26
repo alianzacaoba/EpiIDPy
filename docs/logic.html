@@ -15,6 +15,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SEIR" href="projects.html" />
     <link rel="prev" title="Welcome to SIRPy’s documentation!" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -82,6 +83,8 @@
 :type x: Object Compartments
 :param t: time (scalar)
 :type t: int
+:param kwargs: dict of parameters
+:type kwargs: dict
 :returns: Disease model equations.
 :rtype: object</p>
 </dd></dl>
@@ -92,8 +95,8 @@
 <dd><p>Returns all values of the disease model.
 :param days: days of calculate
 :type days: int
-:param r0: the effective transmission rate, defaulting to a constant
-:type r0: double
+:param kwargs: dict of parameters
+:type kwargs: dict
 :returns: Values by compartment.
 :rtype: dict</p>
 </dd></dl>
@@ -157,8 +160,8 @@ implement default like this:</p>
 :type file: str
 :param delimiter: delimiter
 :type delimiter: str
-:returns: List
-:rtype: List</p>
+:returns: Dictionary of contact matrix by age
+:rtype: dict</p>
 </dd></dl>
 
 <dl class="py method">
@@ -169,41 +172,35 @@ implement default like this:</p>
 <dl class="py method">
 <dt id="logic.utils.Utils.initial_population">
 <em class="property">static </em><code class="sig-name descname">initial_population</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">','</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a><a class="reference internal" href="_modules/logic/utils.html#Utils.initial_population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.Utils.initial_population" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load Population file
+<dd><p>Load population by department and work group.
 :param file: name of file.
 :type file: str
 :param delimiter: delimiter
 :type delimiter: str
-:param year: year of population
-:type year: int
-:returns: Dictionary of population by department.
+:returns: Dictionary of population by department and work group.
 :rtype: dict</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="logic.utils.Utils.initial_population_ct">
 <em class="property">static </em><code class="sig-name descname">initial_population_ct</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">','</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a><a class="reference internal" href="_modules/logic/utils.html#Utils.initial_population_ct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.Utils.initial_population_ct" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load Population file
+<dd><p>Load population by department and work group.
 :param file: name of file.
 :type file: str
 :param delimiter: delimiter
 :type delimiter: str
-:param year: year of population
-:type year: int
-:returns: Dictionary of population by department.
+:returns: Dictionary of population by department and work group.
 :rtype: dict</p>
 </dd></dl>
 
 <dl class="py method">
 <dt id="logic.utils.Utils.input_time">
 <em class="property">static </em><code class="sig-name descname">input_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">','</span></em>, <em class="sig-param"><span class="n">parameter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'InitialSus'</span></em>, <em class="sig-param"><span class="n">filter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'BASE_VALUE'</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a><a class="reference internal" href="_modules/logic/utils.html#Utils.input_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.Utils.input_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load input_time file
+<dd><p>Load input time
 :param file: name of file.
 :type file: str
 :param delimiter: delimiter
 :type delimiter: str
-:param year: year of population
-:type year: int
 :returns: Dictionary of population by department.
 :rtype: dict</p>
 </dd></dl>
@@ -219,54 +216,16 @@ implement default like this:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="logic.utils.Utils.population">
-<em class="property">static </em><code class="sig-name descname">population</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">','</span></em>, <em class="sig-param"><span class="n">year</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">2020</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a><a class="reference internal" href="_modules/logic/utils.html#Utils.population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.Utils.population" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load Population file
-:param file: name of file.
-:type file: str
-:param delimiter: delimiter
-:type delimiter: str
-:param year: year of population
-:type year: int
-:returns: Dictionary of population by department.
-:rtype: dict</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="logic.utils.Utils.priority_vaccine">
-<em class="property">static </em><code class="sig-name descname">priority_vaccine</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">','</span></em>, <em class="sig-param"><span class="n">scenario</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.9)">int</a></span> <span class="o">=</span> <span class="default_value">1</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.9)">list</a><a class="reference internal" href="_modules/logic/utils.html#Utils.priority_vaccine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.Utils.priority_vaccine" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load priority age group by department.
-:param file: name of file.
-:type file: str
-:param delimiter: delimiter
-:type delimiter: str
-:returns: list of priority .
-:rtype: list</p>
-</dd></dl>
-
-<dl class="py method">
 <dt id="logic.utils.Utils.probabilities">
 <em class="property">static </em><code class="sig-name descname">probabilities</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">','</span></em>, <em class="sig-param"><span class="n">parameter_1</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'InitialSus'</span></em>, <em class="sig-param"><span class="n">parameter_2</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'None'</span></em>, <em class="sig-param"><span class="n">filter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'BASE_VALUE'</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a><a class="reference internal" href="_modules/logic/utils.html#Utils.probabilities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.Utils.probabilities" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load probabilities file
+<dd><p>Load probabilities rate.
 :param file: name of file.
 :type file: str
 :param delimiter: delimiter
 :type delimiter: str
 :param year: year of population
 :type year: int
-:returns: Dictionary of population by department.
-:rtype: dict</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="logic.utils.Utils.region_capacities">
-<em class="property">static </em><code class="sig-name descname">region_capacities</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">','</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a><a class="reference internal" href="_modules/logic/utils.html#Utils.region_capacities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.Utils.region_capacities" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load region capacities
-:param file: name of file.
-:type file: str
-:param delimiter: delimiter
-:type delimiter: str
-:returns: Dict of region capacities
+:returns: Dictionary of probabilities rate
 :rtype: dict</p>
 </dd></dl>
 
@@ -285,14 +244,12 @@ implement default like this:</p>
 <dl class="py method">
 <dt id="logic.utils.Utils.total_population">
 <em class="property">static </em><code class="sig-name descname">total_population</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">','</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a><a class="reference internal" href="_modules/logic/utils.html#Utils.total_population"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.Utils.total_population" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load Population file
+<dd><p>Load total population by department.
 :param file: name of file.
 :type file: str
 :param delimiter: delimiter
 :type delimiter: str
-:param year: year of population
-:type year: int
-:returns: Dictionary of population by department.
+:returns: Dictionary of total population by department.
 :rtype: dict</p>
 </dd></dl>
 
@@ -322,6 +279,8 @@ implement default like this:</p>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Compartments</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#module-logic.disease_model">Disease Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#module-logic.utils">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="projects.html">SEIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="projects.html#contact-tracing">Contact Tracing</a></li>
 </ul>
 
 <div class="relations">
@@ -329,6 +288,7 @@ implement default like this:</p>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
       <li>Previous: <a href="index.html" title="previous chapter">Welcome to SIRPy’s documentation!</a></li>
+      <li>Next: <a href="projects.html" title="next chapter">SEIR</a></li>
   </ul></li>
 </ul>
 </div>

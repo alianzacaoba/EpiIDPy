@@ -38,10 +38,9 @@ class SEIR_US(DiseaseModel):
             cm7 = kwargs.get('conmat7') if type(kwargs.get('conmat7')) is float else 1.0
             nco = 3000
 
-
-            # I all compartments - number of compartments within county 
+            # I all compartments - number of compartments within county
             icn_all_I = []
-            for icI in range(nco): 
+            for icI in range(nco):
                 icn_all_I.append = sum(x[icI * range(16, 24)])
 
             # equations for all compartments
@@ -52,8 +51,9 @@ class SEIR_US(DiseaseModel):
                     icn_all.append = [inc]
 
                 # sums
-                s0, s1, s2, s3, s4, s5, s6, s7, e0, e1, e2, e3, e4, e5, e6, e7, i0, i1, i2, i3, i4, i5, i6, i7, r0, r1, r2, r3, r4, r5, r6, r7 = x[icn_all]
-                nc = s0 + s1 + s2 + s3 + s4 + s5 + s6 + s7 + e0 + e1 + e2 + e3 + e4 + e5 + e6 + e7 + i0 + i1 + i2 + i3 + i4 + i5 + i6 + i7 + r0 + r1 + r2 + r3 + r4 + r5 + r6 + r7 
+                s0, s1, s2, s3, s4, s5, s6, s7, e0, e1, e2, e3, e4, e5, e6, e7, i0, i1, i2, i3, i4, i5, i6, i7, r0, r1, r2, r3, r4, r5, r6, r7 = \
+                x[icn_all]
+                nc = s0 + s1 + s2 + s3 + s4 + s5 + s6 + s7 + e0 + e1 + e2 + e3 + e4 + e5 + e6 + e7 + i0 + i1 + i2 + i3 + i4 + i5 + i6 + i7 + r0 + r1 + r2 + r3 + r4 + r5 + r6 + r7
                 i_all = i0 + i1 + i2 + i3 + i4 + i5 + i6 + i7
                 i_all_o = [i0, i1, i2, i3, i4, i5, i6, i7]
 
@@ -64,11 +64,11 @@ class SEIR_US(DiseaseModel):
                 sum_toCurrentF = np.zeros(nco, dtype=double)
 
                 for i11 in range(nco):
-                    fromCurrentF2[i11] = p[nco*ic+i11-nco]
-                    toCurrentF2[i11] = p[nco*ic+i11+nco*nco-nco]
+                    fromCurrentF2[i11] = p[nco * ic + i11 - nco]
+                    toCurrentF2[i11] = p[nco * ic + i11 + nco * nco - nco]
                     sum_fromCurrentF[i11] = fromCurrentF2[i11]
                     sum_toCurrentF[i11] = toCurrentF2[i11] * icn_all_I[i11]
-                
+
                 # equations
                 F1 = ((np.dot(cm0, i_all_o) + sum(sum_toCurrentF) - sum_fromCurrentF) * beta) / nc
                 F2 = ((np.dot(cm1, i_all_o) + sum(sum_toCurrentF) - sum_fromCurrentF) * beta) / nc
@@ -79,71 +79,71 @@ class SEIR_US(DiseaseModel):
                 F6 = ((np.dot(cm6, i_all_o) + sum(sum_toCurrentF) - sum_fromCurrentF) * beta) / nc
                 F7 = ((np.dot(cm7, i_all_o) + sum(sum_toCurrentF) - sum_fromCurrentF) * beta) / nc
 
-                s0_dt={1:s0*F0,2:b*n}
-                s1_dt={1:s1*F1,2:b*n}
-                s2_dt={1:s2*F2,2:b*n}
-                s3_dt={1:s3*F3,2:b*n}
-                s4_dt={1:s4*F4,2:b*n}
-                s5_dt={1:s5*F5,2:b*n}
-                s6_dt={1:s6*F6,2:b*n}
-                s7_dt={1:s7*F7,2:b*n}
-                e0_dt={1:s0*F0,2:gamma*e0}
-                e1_dt={1:s1*F1,2:gamma*e1}
-                e2_dt={1:s2*F2,2:gamma*e2}
-                e3_dt={1:s3*F3,2:gamma*e3}
-                e4_dt={1:s4*F4,2:gamma*e4}
-                e5_dt={1:s5*F5,2:gamma*e5}
-                e6_dt={1:s6*F6,2:gamma*e6}
-                e7_dt={1:s7*F7,2:gamma*e7}
-                i0_dt = {1: gamma*e0, 2: delta*i0}
-                i1_dt = {1: gamma*e1, 2: delta*i1}
-                i2_dt = {1: gamma*e2, 2: delta*i2}
-                i3_dt = {1: gamma*e3, 2: delta*i3}
-                i4_dt = {1: gamma*e4, 2: delta*i4}
-                i5_dt = {1: gamma*e5, 2: delta*i5}
-                i6_dt = {1: gamma*e6, 2: delta*i6}
-                i7_dt = {1: gamma*e7, 2: delta*i7}
-                r0_dt = {1:delta*i0}
-                r1_dt = {1:delta*i1}
-                r2_dt = {1:delta*i2}
-                r3_dt = {1:delta*i3}
-                r4_dt = {1:delta*i4}
-                r5_dt = {1:delta*i5}
-                r6_dt = {1:delta*i6}
-                r7_dt = {1:delta*i7}
+                s0_dt = {1: s0 * F0, 2: b * n}
+                s1_dt = {1: s1 * F1, 2: b * n}
+                s2_dt = {1: s2 * F2, 2: b * n}
+                s3_dt = {1: s3 * F3, 2: b * n}
+                s4_dt = {1: s4 * F4, 2: b * n}
+                s5_dt = {1: s5 * F5, 2: b * n}
+                s6_dt = {1: s6 * F6, 2: b * n}
+                s7_dt = {1: s7 * F7, 2: b * n}
+                e0_dt = {1: s0 * F0, 2: gamma * e0}
+                e1_dt = {1: s1 * F1, 2: gamma * e1}
+                e2_dt = {1: s2 * F2, 2: gamma * e2}
+                e3_dt = {1: s3 * F3, 2: gamma * e3}
+                e4_dt = {1: s4 * F4, 2: gamma * e4}
+                e5_dt = {1: s5 * F5, 2: gamma * e5}
+                e6_dt = {1: s6 * F6, 2: gamma * e6}
+                e7_dt = {1: s7 * F7, 2: gamma * e7}
+                i0_dt = {1: gamma * e0, 2: delta * i0}
+                i1_dt = {1: gamma * e1, 2: delta * i1}
+                i2_dt = {1: gamma * e2, 2: delta * i2}
+                i3_dt = {1: gamma * e3, 2: delta * i3}
+                i4_dt = {1: gamma * e4, 2: delta * i4}
+                i5_dt = {1: gamma * e5, 2: delta * i5}
+                i6_dt = {1: gamma * e6, 2: delta * i6}
+                i7_dt = {1: gamma * e7, 2: delta * i7}
+                r0_dt = {1: delta * i0}
+                r1_dt = {1: delta * i1}
+                r2_dt = {1: delta * i2}
+                r3_dt = {1: delta * i3}
+                r4_dt = {1: delta * i4}
+                r5_dt = {1: delta * i5}
+                r6_dt = {1: delta * i6}
+                r7_dt = {1: delta * i7}
 
-                dx[ic*0] = -s0_dt[1] + s0_dt[2]
-                dx[ic*1] = -s1_dt[1] + s1_dt[2]
-                dx[ic*2] = -s2_dt[1] + s2_dt[2]
-                dx[ic*3] = -s3_dt[1] + s3_dt[2]
-                dx[ic*4] = -s4_dt[1] + s4_dt[2]
-                dx[ic*5] = -s5_dt[1] + s5_dt[2]
-                dx[ic*6] = -s6_dt[1] + s6_dt[2]
-                dx[ic*7] = -s7_dt[1] + s7_dt[2]
-                dx[ic*8] = e0_dt[1] + e0_dt[2]
-                dx[ic*9] = e1_dt[1] + e1_dt[2]
-                dx[ic*10] = e2_dt[1] + e2_dt[2]
-                dx[ic*11] = e3_dt[1] + e3_dt[2]
-                dx[ic*12] = e4_dt[1] + e4_dt[2]
-                dx[ic*13] = e5_dt[1] + e5_dt[2]
-                dx[ic*14] = e6_dt[1] + e6_dt[2]
-                dx[ic*15] = e7_dt[1] + e7_dt[2]
-                dx[ic*16] = i0_dt[1] + i0_dt[2]
-                dx[ic*17] = i1_dt[1] + i1_dt[2]
-                dx[ic*18] = i2_dt[1] + i2_dt[2]
-                dx[ic*19] = i3_dt[1] + i3_dt[2]
-                dx[ic*20] = i4_dt[1] + i4_dt[2]
-                dx[ic*21] = i5_dt[1] + i5_dt[2]
-                dx[ic*22] = i6_dt[1] + i6_dt[2]
-                dx[ic*23] = i7_dt[1] + i7_dt[2]
-                dx[ic*24] = r0_dt[1]
-                dx[ic*25] = r1_dt[1]
-                dx[ic*26] = r2_dt[1]
-                dx[ic*27] = r3_dt[1]
-                dx[ic*28] = r4_dt[1]
-                dx[ic*29] = r5_dt[1]
-                dx[ic*30] = r6_dt[1]
-                dx[ic*31] = r7_dt[1]
+                dx[ic * 0] = -s0_dt[1] + s0_dt[2]
+                dx[ic * 1] = -s1_dt[1] + s1_dt[2]
+                dx[ic * 2] = -s2_dt[1] + s2_dt[2]
+                dx[ic * 3] = -s3_dt[1] + s3_dt[2]
+                dx[ic * 4] = -s4_dt[1] + s4_dt[2]
+                dx[ic * 5] = -s5_dt[1] + s5_dt[2]
+                dx[ic * 6] = -s6_dt[1] + s6_dt[2]
+                dx[ic * 7] = -s7_dt[1] + s7_dt[2]
+                dx[ic * 8] = e0_dt[1] + e0_dt[2]
+                dx[ic * 9] = e1_dt[1] + e1_dt[2]
+                dx[ic * 10] = e2_dt[1] + e2_dt[2]
+                dx[ic * 11] = e3_dt[1] + e3_dt[2]
+                dx[ic * 12] = e4_dt[1] + e4_dt[2]
+                dx[ic * 13] = e5_dt[1] + e5_dt[2]
+                dx[ic * 14] = e6_dt[1] + e6_dt[2]
+                dx[ic * 15] = e7_dt[1] + e7_dt[2]
+                dx[ic * 16] = i0_dt[1] + i0_dt[2]
+                dx[ic * 17] = i1_dt[1] + i1_dt[2]
+                dx[ic * 18] = i2_dt[1] + i2_dt[2]
+                dx[ic * 19] = i3_dt[1] + i3_dt[2]
+                dx[ic * 20] = i4_dt[1] + i4_dt[2]
+                dx[ic * 21] = i5_dt[1] + i5_dt[2]
+                dx[ic * 22] = i6_dt[1] + i6_dt[2]
+                dx[ic * 23] = i7_dt[1] + i7_dt[2]
+                dx[ic * 24] = r0_dt[1]
+                dx[ic * 25] = r1_dt[1]
+                dx[ic * 26] = r2_dt[1]
+                dx[ic * 27] = r3_dt[1]
+                dx[ic * 28] = r4_dt[1]
+                dx[ic * 29] = r5_dt[1]
+                dx[ic * 30] = r6_dt[1]
+                dx[ic * 31] = r7_dt[1]
 
             return dx
         except Exception as e:
@@ -154,17 +154,17 @@ class SEIR_US(DiseaseModel):
 if __name__ == "__main__":
     start_processing_s = time.process_time()
     start_time = datetime.datetime.now()
-    
+
     compartments = []
     for icl in range(3000):
-        s0 = Compartments(name='S0_'+str(icl), value=10000)
-        s1 = Compartments(name='S1_'+str(icl), value=10000)
-        s2 = Compartments(name='S2_'+str(icl), value=10000)
-        s3 = Compartments(name='S3_'+str(icl), value=10000)
-        s4 = Compartments(name='S4_'+str(icl), value=10000)
-        s5 = Compartments(name='S5_'+str(icl), value=10000)
-        s6 = Compartments(name='S6_'+str(icl), value=10000)
-        s7 = Compartments(name='S7_'+str(icl), value=10000)
+        s0 = Compartments(name='S0_' + str(icl), value=10000)
+        s1 = Compartments(name='S1_' + str(icl), value=10000)
+        s2 = Compartments(name='S2_' + str(icl), value=10000)
+        s3 = Compartments(name='S3_' + str(icl), value=10000)
+        s4 = Compartments(name='S4_' + str(icl), value=10000)
+        s5 = Compartments(name='S5_' + str(icl), value=10000)
+        s6 = Compartments(name='S6_' + str(icl), value=10000)
+        s7 = Compartments(name='S7_' + str(icl), value=10000)
 
         compartments.append(s0)
         compartments.append(s1)
@@ -175,15 +175,14 @@ if __name__ == "__main__":
         compartments.append(s6)
         compartments.append(s7)
 
-
-        e0 = Compartments(name='E0_'+str(icl), value=0)
-        e1 = Compartments(name='E1_'+str(icl), value=0)
-        e2 = Compartments(name='E2_'+str(icl), value=0)
-        e3 = Compartments(name='E3_'+str(icl), value=0)
-        e4 = Compartments(name='E4_'+str(icl), value=0)
-        e5 = Compartments(name='E5_'+str(icl), value=0)
-        e6 = Compartments(name='E6_'+str(icl), value=0)
-        e7 = Compartments(name='E7_'+str(icl), value=0)
+        e0 = Compartments(name='E0_' + str(icl), value=0)
+        e1 = Compartments(name='E1_' + str(icl), value=0)
+        e2 = Compartments(name='E2_' + str(icl), value=0)
+        e3 = Compartments(name='E3_' + str(icl), value=0)
+        e4 = Compartments(name='E4_' + str(icl), value=0)
+        e5 = Compartments(name='E5_' + str(icl), value=0)
+        e6 = Compartments(name='E6_' + str(icl), value=0)
+        e7 = Compartments(name='E7_' + str(icl), value=0)
 
         compartments.append(e0)
         compartments.append(e1)
@@ -194,15 +193,14 @@ if __name__ == "__main__":
         compartments.append(e6)
         compartments.append(e7)
 
-
-        i0 = Compartments(name='I0_'+str(icl), value=0)
-        i1 = Compartments(name='I1_'+str(icl), value=0)
-        i2 = Compartments(name='I2_'+str(icl), value=0)
-        i3 = Compartments(name='I3_'+str(icl), value=0)
-        i4 = Compartments(name='I4_'+str(icl), value=1)
-        i5 = Compartments(name='I5_'+str(icl), value=0)
-        i6 = Compartments(name='I6_'+str(icl), value=0)
-        i7 = Compartments(name='I7_'+str(icl), value=0)
+        i0 = Compartments(name='I0_' + str(icl), value=0)
+        i1 = Compartments(name='I1_' + str(icl), value=0)
+        i2 = Compartments(name='I2_' + str(icl), value=0)
+        i3 = Compartments(name='I3_' + str(icl), value=0)
+        i4 = Compartments(name='I4_' + str(icl), value=1)
+        i5 = Compartments(name='I5_' + str(icl), value=0)
+        i6 = Compartments(name='I6_' + str(icl), value=0)
+        i7 = Compartments(name='I7_' + str(icl), value=0)
 
         compartments.append(i0)
         compartments.append(i1)
@@ -213,15 +211,14 @@ if __name__ == "__main__":
         compartments.append(i6)
         compartments.append(i7)
 
-
-        r0 = Compartments(name='R0_'+str(icl), value=0)
-        r1 = Compartments(name='R1_'+str(icl), value=0)
-        r2 = Compartments(name='R2_'+str(icl), value=0)
-        r3 = Compartments(name='R3_'+str(icl), value=0)
-        r4 = Compartments(name='R4_'+str(icl), value=1)
-        r5 = Compartments(name='R5_'+str(icl), value=0)
-        r6 = Compartments(name='R6_'+str(icl), value=0)
-        r7 = Compartments(name='R7_'+str(icl), value=0)
+        r0 = Compartments(name='R0_' + str(icl), value=0)
+        r1 = Compartments(name='R1_' + str(icl), value=0)
+        r2 = Compartments(name='R2_' + str(icl), value=0)
+        r3 = Compartments(name='R3_' + str(icl), value=0)
+        r4 = Compartments(name='R4_' + str(icl), value=1)
+        r5 = Compartments(name='R5_' + str(icl), value=0)
+        r6 = Compartments(name='R6_' + str(icl), value=0)
+        r7 = Compartments(name='R7_' + str(icl), value=0)
 
         compartments.append(r0)
         compartments.append(r1)
@@ -233,7 +230,7 @@ if __name__ == "__main__":
         compartments.append(r7)
 
     ct = SEIR_US(_compartments=compartments, r0=2.0)
-    kwargs = {'b': 0.012/365, 'beta': 0.5, 'gamma': 1/5, 'delta': 1/5}
+    kwargs = {'b': 0.012 / 365, 'beta': 0.5, 'gamma': 1 / 5, 'delta': 1 / 5}
     resp = ct.run(days=365, **kwargs)
     file_csv = DIR_OUTPUT + "{0}.csv".format('seir_us')
     df = pd.DataFrame.from_dict(resp)

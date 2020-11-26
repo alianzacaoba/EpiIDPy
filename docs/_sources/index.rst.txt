@@ -18,6 +18,7 @@ The following illustrates and describes the process of creating a EpilDPy type o
    :caption: Contents:
 
    logic
+   projects
 
 Indices and tables
 ==================

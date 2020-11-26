@@ -58,6 +58,8 @@
 <span class="sd">        :type x: Object Compartments</span>
 <span class="sd">        :param t: time (scalar)</span>
 <span class="sd">        :type t: int</span>
+<span class="sd">        :param kwargs: dict of parameters</span>
+<span class="sd">        :type kwargs: dict</span>
 <span class="sd">        :returns: Disease model equations.</span>
 <span class="sd">        :rtype: object</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -69,6 +71,8 @@
 <span class="sd">        :type x_init: List</span>
 <span class="sd">        :param time_vector:  time (scalar)</span>
 <span class="sd">        :type time_vector: int</span>
+<span class="sd">        :param kwargs: dict of parameters</span>
+<span class="sd">        :type kwargs: dict</span>
 <span class="sd">        :returns: Disease model equations.</span>
 <span class="sd">        :rtype: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -88,8 +92,8 @@
         <span class="sd">&quot;&quot;&quot;Returns all values of the disease model.</span>
 <span class="sd">        :param days: days of calculate</span>
 <span class="sd">        :type days: int</span>
-<span class="sd">        :param r0: the effective transmission rate, defaulting to a constant</span>
-<span class="sd">        :type r0: double</span>
+<span class="sd">        :param kwargs: dict of parameters</span>
+<span class="sd">        :type kwargs: dict</span>
 <span class="sd">        :returns: Values by compartment.</span>
 <span class="sd">        :rtype: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -125,6 +129,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../../logic.html">Compartments</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../logic.html#module-logic.disease_model">Disease Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../logic.html#module-logic.utils">Utils</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../projects.html">SEIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../projects.html#module-projects.contact_tracing.model_contact_tracing">Contact Tracing</a></li>
 </ul>
 
 <div class="relations">

@@ -56,50 +56,13 @@ class Utils(object):
             return None
 
     @staticmethod
-    def population(file: str, delimiter: str = ',', year: int = 2020) -> dict:
-        """Load Population file
-        :param file: name of file.
-        :type file: str
-        :param delimiter: delimiter
-        :type delimiter: str
-        :param year: year of population
-        :type year: int
-        :returns: Dictionary of population by department.
-        :rtype: dict
-        """
-        try:
-            out = []
-            file_path = DIR_INPUT + file + '.csv'
-            with open(file_path, newline='', encoding='utf-8-sig') as f:
-                reader = csv.DictReader(f, delimiter=delimiter)
-                for row in reader:
-                    out.append({str(k).strip(): v for k, v in row.items()})
-            f.close()
-            group = {}
-            for key, _ in groupby(out, key=operator.itemgetter('DEPARTMENT', 'AGE GROUP', str(year))):
-                dep = key[0]
-                value = double(key[2].replace(',', ''))
-                if key[0] not in group:
-                    group[dep] = {key[1]: value}
-                else:
-                    tmp = dict(group[dep])
-                    tmp[key[1]] = value
-                    group[dep] = tmp
-            return group
-        except Exception as e:
-            print('Error load_population: {0}'.format(e))
-            return dict()
-
-    @staticmethod
     def initial_population(file: str, delimiter: str = ',') -> dict:
-        """Load Population file
+        """Load population by department and work group.
         :param file: name of file.
         :type file: str
         :param delimiter: delimiter
         :type delimiter: str
-        :param year: year of population
-        :type year: int
-        :returns: Dictionary of population by department.
+        :returns: Dictionary of population by department and work group.
         :rtype: dict
         """
         try:
@@ -145,14 +108,12 @@ class Utils(object):
 
     @staticmethod
     def initial_population_ct(file: str, delimiter: str = ',') -> dict:
-        """Load Population file
+        """Load population by department and work group.
         :param file: name of file.
         :type file: str
         :param delimiter: delimiter
         :type delimiter: str
-        :param year: year of population
-        :type year: int
-        :returns: Dictionary of population by department.
+        :returns: Dictionary of population by department and work group.
         :rtype: dict
         """
         try:
@@ -195,14 +156,12 @@ class Utils(object):
 
     @staticmethod
     def total_population(file: str, delimiter: str = ',') -> dict:
-        """Load Population file
+        """Load total population by department.
         :param file: name of file.
         :type file: str
         :param delimiter: delimiter
         :type delimiter: str
-        :param year: year of population
-        :type year: int
-        :returns: Dictionary of population by department.
+        :returns: Dictionary of total population by department.
         :rtype: dict
         """
         try:
@@ -239,14 +198,14 @@ class Utils(object):
     @staticmethod
     def probabilities(file: str, delimiter: str = ',', parameter_1: str = 'InitialSus',
                       parameter_2: str = 'None', filter: str = 'BASE_VALUE') -> dict:
-        """Load probabilities file
+        """Load probabilities rate.
         :param file: name of file.
         :type file: str
         :param delimiter: delimiter
         :type delimiter: str
         :param year: year of population
         :type year: int
-        :returns: Dictionary of population by department.
+        :returns: Dictionary of probabilities rate
         :rtype: dict
         """
         try:
@@ -277,13 +236,11 @@ class Utils(object):
 
     @staticmethod
     def input_time(file: str, delimiter: str = ',', parameter: str = 'InitialSus', filter: str = 'BASE_VALUE') -> dict:
-        """Load input_time file
+        """Load input time
         :param file: name of file.
         :type file: str
         :param delimiter: delimiter
         :type delimiter: str
-        :param year: year of population
-        :type year: int
         :returns: Dictionary of population by department.
         :rtype: dict
         """
@@ -327,41 +284,14 @@ class Utils(object):
             return dict()
 
     @staticmethod
-    def priority_vaccine(file: str, delimiter: str = ",", scenario: int = 1) -> list:
-        """Load priority age group by department.
-        :param file: name of file.
-        :type file: str
-        :param delimiter: delimiter
-        :type delimiter: str
-        :returns: list of priority .
-        :rtype: list
-        """
-        try:
-            file_path = DIR_INPUT + file + '.csv'
-            with open(file_path, newline='', encoding='utf-8-sig') as f:
-                reader = csv.DictReader(f, delimiter=delimiter)
-                data = []
-                for row in reader:
-                    value = int(row['SCENARIO'])
-                    if value == scenario:
-                        data.append(row)
-            f.close()
-            out = [{'AGE_GROUP': key[0], 'WORK_GROUP': key[1], 'HEALTH_GROUP': key[2]}
-                   for key, _ in groupby(data, key=operator.itemgetter('AGE_GROUP', 'WORK_GROUP', 'HEALTH_GROUP'))]
-            return out
-        except Exception as e:
-            print('Error priority_vaccine: {0}'.format(e))
-            return list()
-
-    @staticmethod
     def contact_matrices(file: str, delimiter: str = ",") -> dict:
         """Load Contact Matrix file
         :param file: name of file.
         :type file: str
         :param delimiter: delimiter
         :type delimiter: str
-        :returns: List
-        :rtype: List
+        :returns: Dictionary of contact matrix by age
+        :rtype: dict
         """
         try:
             out = {}
@@ -380,30 +310,6 @@ class Utils(object):
             return out
         except Exception as e:
             print('Error load_contact_matrices: {0}'.format(e))
-            return dict()
-
-    @staticmethod
-    def region_capacities(file: str, delimiter: str = ",") -> dict:
-        """Load region capacities
-        :param file: name of file.
-        :type file: str
-        :param delimiter: delimiter
-        :type delimiter: str
-        :returns: Dict of region capacities
-        :rtype: dict
-        """
-        try:
-            out = {}
-            file_path = DIR_INPUT + file + '.csv'
-            with open(file_path, newline='', encoding='utf-8-sig') as f:
-                reader = csv.reader(f, delimiter=delimiter)
-                next(reader)
-                for row in reader:
-                    out[row[0]] = int(row[1])
-            f.close()
-            return out
-        except Exception as e:
-            print('Error region_capacities: {0}'.format(e))
             return dict()
 
     @staticmethod

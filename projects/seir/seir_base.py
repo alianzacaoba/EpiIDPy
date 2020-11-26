@@ -11,14 +11,14 @@ from root import DIR_OUTPUT
 
 
 class SEIR(DiseaseModel):
-    """ Class used to represent an Contact Tracing disease model """
+    """ Class used to represent an SEIR model """
 
     def __init__(self, _compartments: List[Compartments], r0: float):
         """
-        Initialize the run of contact tracing disease model
+        Initialize the run of SEIR disease model
         """
         super().__init__(_compartments, r0=r0)
-        self.population = Utils.population(file='population', year=2020)
+        self.population = Utils.total_population(file='initial_population')
         self._num_comp = len(_compartments)
         self.util = Utils()
 

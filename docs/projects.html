@@ -1,0 +1,156 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SEIR &#8212; EpilDPy 1 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Compartments" href="logic.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="module-projects.seir.seir_base">
+<span id="seir"></span><h1>SEIR<a class="headerlink" href="#module-projects.seir.seir_base" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="projects.seir.seir_base.SEIR">
+<em class="property">class </em><code class="sig-prename descclassname">projects.seir.seir_base.</code><code class="sig-name descname">SEIR</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_compartments</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="logic.html#logic.compartments.Compartments" title="logic.compartments.Compartments">logic.compartments.Compartments</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">r0</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/projects/seir/seir_base.html#SEIR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#projects.seir.seir_base.SEIR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="logic.html#logic.disease_model.DiseaseModel" title="logic.disease_model.DiseaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">logic.disease_model.DiseaseModel</span></code></a></p>
+<p>Class used to represent an SEIR model</p>
+<dl class="py method">
+<dt id="projects.seir.seir_base.SEIR.equations">
+<code class="sig-name descname">equations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/projects/seir/seir_base.html#SEIR.equations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#projects.seir.seir_base.SEIR.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time derivative of the state vector.
+:param x: The compartment vector (array_like)
+:type x: Object Compartments
+:param t: time (scalar)
+:type t: int
+:param kwargs: dict of parameters
+:type kwargs: dict
+:returns: Disease model equations.
+:rtype: object</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-projects.contact_tracing.model_contact_tracing">
+<span id="contact-tracing"></span><h1>Contact Tracing<a class="headerlink" href="#module-projects.contact_tracing.model_contact_tracing" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt id="projects.contact_tracing.model_contact_tracing.ModelContactTracing">
+<em class="property">class </em><code class="sig-prename descclassname">projects.contact_tracing.model_contact_tracing.</code><code class="sig-name descname">ModelContactTracing</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">_compartments</span><span class="p">:</span> <span class="n">List<span class="p">[</span><a class="reference internal" href="logic.html#logic.compartments.Compartments" title="logic.compartments.Compartments">logic.compartments.Compartments</a><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">r0</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.9)">float</a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/projects/contact_tracing/model_contact_tracing.html#ModelContactTracing"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#projects.contact_tracing.model_contact_tracing.ModelContactTracing" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="logic.html#logic.disease_model.DiseaseModel" title="logic.disease_model.DiseaseModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">logic.disease_model.DiseaseModel</span></code></a></p>
+<p>Class used to represent an Contact Tracing disease model</p>
+<dl class="py method">
+<dt id="projects.contact_tracing.model_contact_tracing.ModelContactTracing.equations">
+<code class="sig-name descname">equations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/projects/contact_tracing/model_contact_tracing.html#ModelContactTracing.equations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#projects.contact_tracing.model_contact_tracing.ModelContactTracing.equations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Time derivative of the state vector.
+:param x: The compartment vector (array_like)
+:type x: Object Compartments
+:param t: time (scalar)
+:type t: int
+:param kwargs: dict of parameters
+:type kwargs: dict
+:returns: Disease model equations.
+:rtype: object</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">EpilDPy</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="logic.html">Compartments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logic.html#module-logic.disease_model">Disease Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logic.html#module-logic.utils">Utils</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">SEIR</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#module-projects.contact_tracing.model_contact_tracing">Contact Tracing</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="logic.html" title="previous chapter">Compartments</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.2.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/projects.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

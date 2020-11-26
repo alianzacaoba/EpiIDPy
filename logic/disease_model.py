@@ -24,6 +24,8 @@ class DiseaseModel(ABC):
         :type x: Object Compartments
         :param t: time (scalar)
         :type t: int
+        :param kwargs: dict of parameters
+        :type kwargs: dict
         :returns: Disease model equations.
         :rtype: object
         """
@@ -35,6 +37,8 @@ class DiseaseModel(ABC):
         :type x_init: List
         :param time_vector:  time (scalar)
         :type time_vector: int
+        :param kwargs: dict of parameters
+        :type kwargs: dict
         :returns: Disease model equations.
         :rtype: dict
         """
@@ -54,8 +58,8 @@ class DiseaseModel(ABC):
         """Returns all values of the disease model.
         :param days: days of calculate
         :type days: int
-        :param r0: the effective transmission rate, defaulting to a constant
-        :type r0: double
+        :param kwargs: dict of parameters
+        :type kwargs: dict
         :returns: Values by compartment.
         :rtype: dict
         """

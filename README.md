@@ -33,7 +33,7 @@ the file in the path "EpilDPy / data / input" and then call the function for exa
 4.	The new model created is instantiated with the compartments list and three values such as value_a, value_b, value_c, 
 which are used for the calculations of the equations because they are instance values by the **DiseaseModel** class. 
 Regarding the default values, if you want to install them, you must assign them the value 0.0. <br />
-    `ct = ContactTracing(compartments=compartments, value_a=GAMMA, value_b=BETA, value_c=0.0)`
+    `ct = ContactTracing(compartments=compartments, value_a=beta)`
 5.	In order to define the equations of the corresponding model, the equation function must be implemented, 
 which defines the differential equations that the model will calculate. For this activity it is recommended to use 
 dictionaries to optimize the implementation of the equations. Here is an example of how you can implement 

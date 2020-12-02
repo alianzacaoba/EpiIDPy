@@ -196,8 +196,8 @@ class Utils(object):
             return dict()
 
     @staticmethod
-    def probabilities(file: str, delimiter: str = ',', parameter_1: str = 'InitialSus',
-                      parameter_2: str = 'None', filter: str = 'BASE_VALUE') -> dict:
+    def probabilities(delimiter: str = ',', parameter_1: str = 'PresymptomaticInfectionInExposed',
+                      parameter_2: str = 'None', filter: str = 'VALUE') -> dict:
         """Load probabilities rate.
         :param file: name of file.
         :type file: str
@@ -210,24 +210,23 @@ class Utils(object):
         """
         try:
             out = {}
-            file_path = DIR_INPUT + file + '.csv'
+            file_path = DIR_INPUT + 'input_probabilities.csv'
             with open(file_path, newline='', encoding='utf-8-sig') as f:
                 reader = csv.DictReader(f, delimiter=delimiter)
                 for row in reader:
-                    parameter = str(row['PARAMETER'])
+                    parameter = str(row['PARAMETER']).strip()
                     if parameter == parameter_1 and parameter_2 == 'ALL':
-                        out[parameter_2] = float(row[filter])
-                        break
+                        out[row['AGE_GROUP']] = float(row[filter])
                     elif parameter == parameter_1 and parameter_2 == 'None':
-                        health = row['HEALTH_GROUP']
+                        work = row['WORK_GROUP']
                         age_group = row['AGE_GROUP']
-                        if health not in out:
-                            out[health] = {age_group: float(row[filter])}
+                        if work not in out:
+                            out[work] = {age_group: float(row[filter])}
                         else:
-                            tmp_value = dict(out[health])
+                            tmp_value = dict(out[work])
                             if age_group not in tmp_value:
                                 tmp_value[age_group] = float(row[filter])
-                            out[health] = tmp_value
+                            out[work] = tmp_value
             f.close()
             return out
         except Exception as e:
@@ -235,7 +234,7 @@ class Utils(object):
             return dict()
 
     @staticmethod
-    def input_time(file: str, delimiter: str = ',', parameter: str = 'InitialSus', filter: str = 'BASE_VALUE') -> dict:
+    def input_time(delimiter: str = ',') -> dict:
         """Load input time
         :param file: name of file.
         :type file: str
@@ -246,12 +245,16 @@ class Utils(object):
         """
         try:
             out = {}
-            file_path = DIR_INPUT + file + '.csv'
+            file_path = DIR_INPUT + 'input_time.csv'
             with open(file_path, newline='', encoding='utf-8-sig') as f:
                 reader = csv.DictReader(f, delimiter=delimiter)
                 for row in reader:
-                    if str(row['PARAMETER']) == parameter:
-                        out[row['AGE_GROUP']] = float(row[filter])
+                    parameter = str(row['PARAMETER']).strip()
+                    value = float(row['VALUE'])
+                    if value > 0.0:
+                        out[parameter] = 1 / value
+                    else:
+                        out[parameter] = 0.0
             f.close()
             return out
         except Exception as e:

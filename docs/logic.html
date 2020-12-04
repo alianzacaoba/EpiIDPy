@@ -16,7 +16,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="SEIR" href="projects.html" />
-    <link rel="prev" title="Welcome to SIRPy’s documentation!" href="index.html" />
+    <link rel="prev" title="Welcome to The Epidemiology of infectious diseases in Python (EpilDPy) framework documentation!" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -78,7 +78,7 @@
 <dl class="py method">
 <dt id="logic.disease_model.DiseaseModel.equations">
 <code class="sig-name descname">equations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">x</span></em>, <em class="sig-param"><span class="n">t</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/logic/disease_model.html#DiseaseModel.equations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.disease_model.DiseaseModel.equations" title="Permalink to this definition">¶</a></dt>
-<dd><p>Time derivative of the state vector.
+<dd><p>Time equations of the state vector.
 :param x: The compartment vector (array_like)
 :type x: Object Compartments
 :param t: time (scalar)
@@ -195,7 +195,7 @@ implement default like this:</p>
 
 <dl class="py method">
 <dt id="logic.utils.Utils.input_time">
-<em class="property">static </em><code class="sig-name descname">input_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">','</span></em>, <em class="sig-param"><span class="n">parameter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'InitialSus'</span></em>, <em class="sig-param"><span class="n">filter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'BASE_VALUE'</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a><a class="reference internal" href="_modules/logic/utils.html#Utils.input_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.Utils.input_time" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">input_time</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">delimiter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">','</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a><a class="reference internal" href="_modules/logic/utils.html#Utils.input_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.Utils.input_time" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load input time
 :param file: name of file.
 :type file: str
@@ -217,7 +217,7 @@ implement default like this:</p>
 
 <dl class="py method">
 <dt id="logic.utils.Utils.probabilities">
-<em class="property">static </em><code class="sig-name descname">probabilities</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">file</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span></em>, <em class="sig-param"><span class="n">delimiter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">','</span></em>, <em class="sig-param"><span class="n">parameter_1</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'InitialSus'</span></em>, <em class="sig-param"><span class="n">parameter_2</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'None'</span></em>, <em class="sig-param"><span class="n">filter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'BASE_VALUE'</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a><a class="reference internal" href="_modules/logic/utils.html#Utils.probabilities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.Utils.probabilities" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="sig-name descname">probabilities</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">delimiter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">','</span></em>, <em class="sig-param"><span class="n">parameter_1</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'PresymptomaticInfectionInExposed'</span></em>, <em class="sig-param"><span class="n">parameter_2</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'None'</span></em>, <em class="sig-param"><span class="n">filter</span><span class="p">:</span> <span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.9)">str</a></span> <span class="o">=</span> <span class="default_value">'VALUE'</span></em><span class="sig-paren">)</span> &#x2192; <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.9)">dict</a><a class="reference internal" href="_modules/logic/utils.html#Utils.probabilities"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#logic.utils.Utils.probabilities" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load probabilities rate.
 :param file: name of file.
 :type file: str
@@ -280,14 +280,14 @@ implement default like this:</p>
 <li class="toctree-l1"><a class="reference internal" href="#module-logic.disease_model">Disease Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#module-logic.utils">Utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="projects.html">SEIR</a></li>
-<li class="toctree-l1"><a class="reference internal" href="projects.html#contact-tracing">Contact Tracing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="projects.html#module-projects.contact_tracing.model_contact_tracing">Contact Tracing</a></li>
 </ul>
 
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">Welcome to SIRPy’s documentation!</a></li>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to The Epidemiology of infectious diseases in Python (EpilDPy) framework documentation!</a></li>
       <li>Next: <a href="projects.html" title="next chapter">SEIR</a></li>
   </ul></li>
 </ul>

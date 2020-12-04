@@ -19,7 +19,7 @@ class DiseaseModel(ABC):
         self._r0 = r0
 
     def equations(self, x, t, **kwargs):
-        """Time derivative of the state vector.
+        """Time equations of the state vector.
         :param x: The compartment vector (array_like)
         :type x: Object Compartments
         :param t: time (scalar)

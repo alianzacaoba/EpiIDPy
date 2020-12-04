@@ -20,6 +20,12 @@ class ModelContactTracing(DiseaseModel):
         self._num_comp = len(_compartments)
 
     def equations(self, x, t, **kwargs):
+        """Time equations of the state vector.
+        Keyword kwargs:
+            contact_matrix dict: contact matrix by age group
+        :returns: Disease model equations.
+        :rtype: dict
+        """
         try:
             # OA entra como paramento como un lista de ocupación por grupo etario
             dx = np.zeros(self._num_comp, dtype=double)
@@ -33,27 +39,25 @@ class ModelContactTracing(DiseaseModel):
             mi_ah = kwargs.get('mi_ah') if type(kwargs.get('mi_ah')) is float else 1.0
             mi_au = kwargs.get('mi_au') if type(kwargs.get('mi_au')) is float else 1.0
 
-            beta = kwargs.get('beta') if type(kwargs.get('beta')) is float else 1.0
-            fi = kwargs.get('fi') if type(kwargs.get('fi')) is float else 1.0
-            alfa = kwargs.get('alfa') if type(kwargs.get('alfa')) is float else 1.0
+            beta = kwargs.get('beta') if type(kwargs.get('beta')) is float else 0.0
+            fi = kwargs.get('fi') if type(kwargs.get('fi')) is float else 0.0
+            alfa = kwargs.get('alfa') if type(kwargs.get('alfa')) is float else 0.0
 
-            ro = kwargs.get('ro') if type(kwargs.get('ro')) is float else 1.0
-            tt = kwargs.get('tt') if type(kwargs.get('tt')) is float else 1.0
-            delta = kwargs.get('delta') if type(kwargs.get('delta')) is float else 1.0
-            ma = kwargs.get('ma') if type(kwargs.get('ma')) is float else 1.0
+            ro = kwargs.get('ro') if type(kwargs.get('ro')) is float else 0.0
+            tt = kwargs.get('tt') if type(kwargs.get('tt')) is float else 0.0
+            delta = kwargs.get('delta') if type(kwargs.get('delta')) is float else 0.0
 
-            ceta = kwargs.get('ceta') if type(kwargs.get('ceta')) is float else 1.0
-            gg = kwargs.get('g') if type(kwargs.get('g')) is float else 1.0
-            hh = kwargs.get('hh') if type(kwargs.get('hh')) is float else 1.0
-            uu = kwargs.get('uu') if type(kwargs.get('uu')) is float else 1.0
-            pi = kwargs.get('pi') if type(kwargs.get('pi')) is float else 1.0
-            sigma = kwargs.get('sigma') if type(kwargs.get('sigma')) is float else 1.0
-            tao = kwargs.get('tao') if type(kwargs.get('tao')) is float else 1.0
-            omega = kwargs.get('omega') if type(kwargs.get('omega')) is float else 1.0
+            ceta = kwargs.get('ceta') if type(kwargs.get('ceta')) is float else 0.0
+            gg = kwargs.get('g') if type(kwargs.get('g')) is float else 0.0
+            hh = kwargs.get('hh') if type(kwargs.get('hh')) is float else 0.0
+            uu = kwargs.get('uu') if type(kwargs.get('uu')) is float else 0.0
+            pi = kwargs.get('pi') if type(kwargs.get('pi')) is float else 0.0
+            sigma = kwargs.get('sigma') if type(kwargs.get('sigma')) is float else 0.0
+            tao = kwargs.get('tao') if type(kwargs.get('tao')) is float else 0.0
+            omega = kwargs.get('omega') if type(kwargs.get('omega')) is float else 0.0
 
-            s_toa, e_toa, p_toa, a_toa, r_toa, s_oa, e_oa, p_oa, a_oa, ii_oa, i_oa, c_oa, i, h, u, d, r_oa = x
+            s_oa,  e_oa, a_oa, p_oa, s_toa, e_toa,  a_toa, p_toa, ii_oa, i_oa, c_oa, h_oa, u_oa, d_oa, r_oa, r_toa = x
 
-            i_i = ii_oa
             t_oa = s_toa + e_toa + a_toa + p_toa + r_toa
             population_list = [float(v) for _, v in population.items()]
 
@@ -61,58 +65,52 @@ class ModelContactTracing(DiseaseModel):
             prod_matrix = sum(prod_matrix)
 
             f = (beta * prod_matrix * (i_oa + a_oa + p_oa)) / total_population
-            f_g = f * (s_toa + s_oa)
-            f_toa = f_g * tt
+            f_oa = f * (s_toa + s_oa)
+            f_toa = f_oa * tt
 
-            ds_toa = {1: fi * s_toa, 2: -f * s_toa, 3: -mi_ae * s_toa,
-                      4: f_toa * s_toa, 5: -ro * s_toa}
+            ds_toa = {1: fi * s_toa, 2: -f * s_toa, 3: -mi_ae * s_toa, 4: f_toa * s_toa, 5: -ro * s_toa}
             ds_oa = {1: fi * s_oa, 2: -f * s_oa, 3: -mi_ae * s_oa, 4: ro * s_oa}
 
-            de_toa = {1: f * s_toa, 2: -alfa * e_oa, 3: -mi_ae * e_toa,
-                      4: f_toa * e_toa, 5: -ro * e_toa}
-            de_oa = {1: f * s_oa, 2: -alfa * e_oa, 3: -mi_ae * e_oa, 4: -ro * e_toa}
+            de_toa = {1: f * s_toa, 2: -alfa * e_oa, 3: -mi_ae * e_toa, 4: f_toa * e_toa, 5: -ro * e_toa}
+            de_oa = {1: f * s_oa, 2: -alfa * e_oa, 3: -mi_ae * e_oa, 4: ro * e_toa}
 
-            da_toa = {1: alfa * (1 - gg) * e_oa, 2: -ceta * a_toa, 3: -mi_ae * a_toa,
-                      4: f_toa * a_toa, 5: -ro * a_toa}
-            da_oa = {1: alfa * (1 - gg) * e_oa, 2: -ceta * a_oa,
-                     3: -mi_ae * a_oa, 4: ro * a_oa}
+            da_toa = {1: alfa * (1 - gg) * e_oa, 2: -ceta * a_toa, 3: -mi_ae * a_toa, 4: f_toa * a_toa, 5: -ro * a_toa}
+            da_oa = {1: alfa * (1 - gg) * e_oa, 2: -ceta * a_oa, 3: -mi_ae * a_oa, 4: ro * a_oa}
 
             dp_toa = {1: alfa * gg * e_oa, 2: -delta * p_toa, 3: -mi_ae * p_toa,
-                      4: ma * p_toa, 5: f_toa * p_toa, 6: -ro * p_toa}
-            dp_oa = {1: alfa * gg * e_oa, 2: -delta * p_oa, 3: -mi_ae * p_oa,
-                     4: ma * p_oa, 5: -ro * p_toa}
+                      4: f_toa * p_toa, 6: -ro * p_toa}
+            dp_oa = {1: alfa * gg * e_oa, 2: -delta * p_oa, 3: -mi_ae * p_oa, 4: -ro * p_toa}
 
-            di_ioa = {1: alfa * p_oa, 2: alfa * p_toa,
-                      3: -pi * i_i, 4: f_g * tt * ii_oa}
-            di_oa = {1: alfa * p_oa, 2: -pi * i, 3: f_g * tt * i_oa}
+            di_ioa = {1: alfa * p_oa, 2: alfa * p_toa, 3: -pi * ii_oa, 4: -f_oa * tt * ii_oa}
+            di_oa = {1: alfa * p_oa, 2: -pi * i_oa, 3: -f_oa * tt * i_oa}
 
-            dc_oa = {1: 2 * pi * (1 - (uu + hh)) * (i_i + i), 2: sigma * c_oa}
-            dh_oa = {1: 2 * pi * ro * (i_i + i), 2: -tao * hh}
+            dc_oa = {1: 2 * pi * (1 - (uu + hh)) * (ii_oa + i_oa), 2: -sigma * c_oa}
+            dh_oa = {1: 2 * pi * ro * hh * (ii_oa + i_oa), 2: -tao * h_oa}
 
-            du_oa = {1: 2 * pi * uu * (i_i + i), 2: -omega * uu}
-            dd_oa = {1: sigma * mi_ac * c_oa, 2: tao * mi_ah * ro, 3: omega * mi_au * uu}
+            du_oa = {1: 2 * pi * uu * (ii_oa + i_oa), 2: -omega * u_oa}
+            dd_oa = {1: sigma * mi_ac * c_oa, 2: tao * mi_ah * h_oa, 3: omega * mi_au * u_oa}
 
             dr_toa = {1: ceta * a_oa, 2: f_toa * r_toa, 3: -ro * r_toa}
 
-            dr_oa = {1: sigma * (1 - mi_ac) * c_oa, 2: tao * (1 - mi_ah) * ro,
-                     3: omega * (1 - mi_au) * u, 4: ro * r_toa}
+            dr_oa = {1: sigma * (1 - mi_ac) * c_oa, 2: tao * (1 - mi_ah) * h_oa,
+                     3: omega * (1 - mi_au) * u_oa, 4: ro * r_toa}
 
-            dx[0] = sum([vs for ks, vs in ds_toa.items()])
-            dx[1] = sum([vs for ks, vs in ds_oa.items()])
-            dx[2] = sum([vs for ks, vs in de_toa.items()])
-            dx[3] = sum([ve for ke, ve in de_oa.items()])
-            dx[4] = sum([ve for ke, ve in da_toa.items()])
-            dx[5] = sum([ve for ke, ve in da_oa.items()])
-            dx[6] = sum([vp for kp, vp in dp_toa.items()])
-            dx[7] = sum([vp for kp, vp in dp_oa.items()])
+            dx[0] = sum([vs for ks, vs in ds_oa.items()])
+            dx[1] = sum([ve for ke, ve in de_oa.items()])
+            dx[2] = sum([ve for ke, ve in da_oa.items()])
+            dx[3] = sum([vp for kp, vp in dp_oa.items()])
+            dx[4] = sum([vs for ks, vs in ds_toa.items()])
+            dx[5] = sum([vs for ks, vs in de_toa.items()])
+            dx[6] = sum([ve for ke, ve in da_toa.items()])
+            dx[7] = sum([vp for kp, vp in dp_toa.items()])
             dx[8] = sum([vi for ki, vi in di_ioa.items()])
             dx[9] = sum([vi for ki, vi in di_oa.items()])
             dx[10] = sum([vc for kc, vc in dc_oa.items()])
             dx[11] = sum([vh for kh, vh in dh_oa.items()])
             dx[12] = sum([vu for ku, vu in du_oa.items()])
             dx[13] = sum([vd for kd, vd in dd_oa.items()])
-            dx[14] = sum([vr for kr, vr in dr_toa.items()])
-            dx[15] = sum([vr for kr, vr in dr_oa.items()])
+            dx[14] = sum([vr for kr, vr in dr_oa.items()])
+            dx[15] = sum([vr for kr, vr in dr_toa.items()])
 
             return dx
         except Exception as e:
@@ -138,41 +136,38 @@ if __name__ == "__main__":
     contact_matrix = Utils.contact_matrices(file='contact_matrix', delimiter=',')
 
     compartments = []
-    s_toa = Compartments(name="Susceptible traced", value=0.0)
-    compartments.append(s_toa)
-    e_toa = Compartments(name="Exposed traced", value=0.0)
-    compartments.append(e_toa)
-    p_toa = Compartments(name="Pre-symptomatic traced", value=0.0)
-    compartments.append(p_toa)
-    a_toa = Compartments(name="Asymptomatic traced", value=0.0)
-    compartments.append(a_toa)
-    r_toa = Compartments(name="recovered traced", value=0.0)
-    compartments.append(r_toa)
-
     s_oa = Compartments(name="Susceptible", value=0.0)
     compartments.append(s_oa)
     e_oa = Compartments(name="Exposed", value=0.0)
     compartments.append(e_oa)
-    p_oa = Compartments(name="Pre-symptomatic", value=0.0)
-    compartments.append(p_oa)
     a_oa = Compartments(name="Asymptomatic", value=0.0)
     compartments.append(a_oa)
+    p_oa = Compartments(name="Pre-symptomatic", value=0.0)
+    compartments.append(p_oa)
+    s_toa = Compartments(name="Susceptible traced", value=0.0)
+    compartments.append(s_toa)
+    e_toa = Compartments(name="Exposed traced", value=0.0)
+    compartments.append(e_toa)
+    a_toa = Compartments(name="Asymptomatic traced", value=0.0)
+    compartments.append(a_toa)
+    p_toa = Compartments(name="Pre-symptomatic traced", value=0.0)
+    compartments.append(p_toa)
     ii_oa = Compartments(name="Infectious isolate", value=0.0)
     compartments.append(ii_oa)
     i_oa = Compartments(name="Infectious", value=0.0)
     compartments.append(i_oa)
-    i = Compartments(name="Infectious", value=0.0)
-    compartments.append(i)
     c_oa = Compartments(name="Inhomecare-Isolated", value=0.0)
     compartments.append(c_oa)
-    h = Compartments(name="Isolated Hospitalization", value=0.0)
-    compartments.append(h)
-    u = Compartments(name="Isolated-CriticalCare", value=0.0)
-    compartments.append(u)
-    d = Compartments(name="Dead", value=0.0)
-    compartments.append(d)
+    h_oa = Compartments(name="Isolated Hospitalization", value=0.0)
+    compartments.append(h_oa)
+    u_oa = Compartments(name="Isolated-CriticalCare", value=0.0)
+    compartments.append(u_oa)
+    d_oa = Compartments(name="Dead", value=0.0)
+    compartments.append(d_oa)
     r_oa = Compartments(name="Recovered", value=0.0)
     compartments.append(r_oa)
+    r_toa = Compartments(name="recovered traced", value=0.0)
+    compartments.append(r_toa)
 
     kwargs = {'beta': input_time['PerCapitaTransmissionRate'],
               'fi': (0.012/365),

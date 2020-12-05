@@ -5,7 +5,6 @@ import json
 import operator
 import itertools
 import os
-
 from tqdm import tqdm
 import numpy as np
 import pandas as pd
@@ -227,34 +226,6 @@ class Utils(object):
                             if age_group not in tmp_value:
                                 tmp_value[age_group] = float(row[filter])
                             out[work] = tmp_value
-            f.close()
-            return out
-        except Exception as e:
-            print('Error probabilities: {0}'.format(e))
-            return dict()
-
-    @staticmethod
-    def input_time(delimiter: str = ',') -> dict:
-        """Load input time
-        :param file: name of file.
-        :type file: str
-        :param delimiter: delimiter
-        :type delimiter: str
-        :returns: Dictionary of population by department.
-        :rtype: dict
-        """
-        try:
-            out = {}
-            file_path = DIR_INPUT + 'input_time.csv'
-            with open(file_path, newline='', encoding='utf-8-sig') as f:
-                reader = csv.DictReader(f, delimiter=delimiter)
-                for row in reader:
-                    parameter = str(row['PARAMETER']).strip()
-                    value = float(row['VALUE'])
-                    if value > 0.0:
-                        out[parameter] = 1 / value
-                    else:
-                        out[parameter] = 0.0
             f.close()
             return out
         except Exception as e:

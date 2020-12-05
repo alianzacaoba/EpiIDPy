@@ -1,0 +1,13 @@
+input_time = dict(PerCapitaTransmissionRate=2.0,
+                  IncubationTime=1 / 3.0,
+                  PresymptomaticTime=1 / 1.5,
+                  ExposedToAsymptomatic=1 / 5.0,
+                  AsymptomaticToRecovered=1 / 14.0,
+                  PresymptomaticToInfectious=1 / 1.5,
+                  InfectiousToHomecareCare=1 / 5.0,
+                  InfectiousToHospitalizedCare=1 / 5.0,
+                  InfectiousToCriticalCare=0.0,
+                  HomecareToDeath=1 / 5.0,
+                  HospitalizedToDeath=1 / 5.0,
+                  CriticalCareToDeath=1 / 5.0,
+                  TraceNoTrace=1 / 15.0)

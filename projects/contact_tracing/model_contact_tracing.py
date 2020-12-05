@@ -7,6 +7,7 @@ from tqdm import tqdm
 from logic.compartments import Compartments
 from logic.disease_model import DiseaseModel
 from logic.utils import Utils
+from data.input.input_time import input_time
 
 
 class ModelContactTracing(DiseaseModel):
@@ -21,8 +22,14 @@ class ModelContactTracing(DiseaseModel):
 
     def equations(self, x, t, **kwargs):
         """Time equations of the state vector.
+        :param x: The compartment vector (array_like)
+        :type x: Object Compartments
+        :param t: time (scalar)
+        :type t: int
         Keyword kwargs:
-            contact_matrix dict: contact matrix by age group
+            :contact_matrix dict: contact matrix by age group.
+            :population dict: dictionary by departament and age group.
+            :total_population float: total population by departament.
         :returns: Disease model equations.
         :rtype: dict
         """
@@ -56,7 +63,7 @@ class ModelContactTracing(DiseaseModel):
             tao = kwargs.get('tao') if type(kwargs.get('tao')) is float else 0.0
             omega = kwargs.get('omega') if type(kwargs.get('omega')) is float else 0.0
 
-            s_oa,  e_oa, a_oa, p_oa, s_toa, e_toa,  a_toa, p_toa, ii_oa, i_oa, c_oa, h_oa, u_oa, d_oa, r_oa, r_toa = x
+            s_oa, s_toa, e_oa, e_toa, a_oa, a_toa, p_oa, p_toa, ii_oa, i_oa, c_oa, h_oa, u_oa, d_oa, r_oa, r_toa = x
 
             t_oa = s_toa + e_toa + a_toa + p_toa + r_toa
             population_list = [float(v) for _, v in population.items()]
@@ -96,12 +103,12 @@ class ModelContactTracing(DiseaseModel):
                      3: omega * (1 - mi_au) * u_oa, 4: ro * r_toa}
 
             dx[0] = sum([vs for ks, vs in ds_oa.items()])
-            dx[1] = sum([ve for ke, ve in de_oa.items()])
-            dx[2] = sum([ve for ke, ve in da_oa.items()])
-            dx[3] = sum([vp for kp, vp in dp_oa.items()])
-            dx[4] = sum([vs for ks, vs in ds_toa.items()])
-            dx[5] = sum([vs for ks, vs in de_toa.items()])
-            dx[6] = sum([ve for ke, ve in da_toa.items()])
+            dx[1] = sum([vs for ks, vs in ds_toa.items()])
+            dx[2] = sum([ve for ke, ve in de_oa.items()])
+            dx[3] = sum([vs for ks, vs in de_toa.items()])
+            dx[4] = sum([ve for ke, ve in da_oa.items()])
+            dx[5] = sum([ve for ke, ve in da_toa.items()])
+            dx[6] = sum([vp for kp, vp in dp_oa.items()])
             dx[7] = sum([vp for kp, vp in dp_toa.items()])
             dx[8] = sum([vi for ki, vi in di_ioa.items()])
             dx[9] = sum([vi for ki, vi in di_oa.items()])
@@ -122,7 +129,6 @@ if __name__ == "__main__":
     start_processing_s = time.process_time()
     start_time = datetime.datetime.now()
     ut = Utils()
-    input_time = ut.input_time()
     initial_population = ut.initial_population_ct(file='initial_population', delimiter=';')
     total_population = ut.total_population(file='initial_population', delimiter=';')
     mi_ae = ut.probabilities(parameter_1='MortalityAllCauseMortality', parameter_2='ALL')
@@ -138,18 +144,18 @@ if __name__ == "__main__":
     compartments = []
     s_oa = Compartments(name="Susceptible", value=0.0)
     compartments.append(s_oa)
-    e_oa = Compartments(name="Exposed", value=0.0)
-    compartments.append(e_oa)
-    a_oa = Compartments(name="Asymptomatic", value=0.0)
-    compartments.append(a_oa)
-    p_oa = Compartments(name="Pre-symptomatic", value=0.0)
-    compartments.append(p_oa)
     s_toa = Compartments(name="Susceptible traced", value=0.0)
     compartments.append(s_toa)
+    e_oa = Compartments(name="Exposed", value=0.0)
+    compartments.append(e_oa)
     e_toa = Compartments(name="Exposed traced", value=0.0)
     compartments.append(e_toa)
+    a_oa = Compartments(name="Asymptomatic", value=0.0)
+    compartments.append(a_oa)
     a_toa = Compartments(name="Asymptomatic traced", value=0.0)
     compartments.append(a_toa)
+    p_oa = Compartments(name="Pre-symptomatic", value=0.0)
+    compartments.append(p_oa)
     p_toa = Compartments(name="Pre-symptomatic traced", value=0.0)
     compartments.append(p_toa)
     ii_oa = Compartments(name="Infectious isolate", value=0.0)
